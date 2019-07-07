@@ -24,7 +24,7 @@
         <common-langs.version>3.8.1</common-langs.version>
         <collection.utils.version>4.3</collection.utils.version>
         <guava.version>19.0</guava.version>
-        <jackson.version>2.9.8</jackson.version>
+        <jackson.version>2.9.9</jackson.version>
         <mockito.version>2.4.2</mockito.version>
         <testng.version>6.8</testng.version>
         <log4j.version>2.7</log4j.version>
