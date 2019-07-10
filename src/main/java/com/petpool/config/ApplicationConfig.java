@@ -5,7 +5,6 @@ import com.petpool.constants.HibernateProperties;
 import com.petpool.db.DataBaseProperties;
 import com.petpool.util.EncryptionTool;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
@@ -46,7 +46,7 @@ public class ApplicationConfig {
 
     @Bean
     public DataSource restDataSource(EncryptionTool encryptionTool, DataBaseProperties dataBaseProperties) {
-        BasicDataSource dataSource = new BasicDataSource();
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(dataBaseProperties.getDriverClass());
         dataSource.setUrl(dataBaseProperties.getUrl());
         dataSource.setUsername(dataBaseProperties.getName());

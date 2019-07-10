@@ -2,6 +2,9 @@ package com.petpool.db;
 
 import lombok.Data;
 
+/**
+ * The data class to wrap and store the data base properties.
+ */
 @Data
 public class DataBaseProperties {
     private String url;
