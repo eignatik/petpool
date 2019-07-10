@@ -4,6 +4,6 @@
 *.jar
 *.war
 
-./idea
+/.idea
 out/
 .DC_Store
