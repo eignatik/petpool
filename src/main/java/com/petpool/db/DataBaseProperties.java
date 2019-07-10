@@ -1,5 +1,8 @@
 package com.petpool.db;
 
+/**
+ * The data class to wrap and store the data base properties.
+ */
 public class DataBaseProperties {
     private String url;
     private String name;
