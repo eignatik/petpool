@@ -4,6 +4,7 @@ package com.petpool.config;
 import com.petpool.constants.HibernateProperties;
 import com.petpool.db.DataBaseProperties;
 import com.petpool.util.EncryptionTool;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import javax.sql.DataSource;
 import java.util.Properties;
 
+@Slf4j
 @Configuration
 @PropertySource("environment.properties")
 public class ApplicationConfig {
