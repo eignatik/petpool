@@ -1,4 +1,4 @@
-package com.petpool.db.entity;
+package com.petpool.domain.shared;
 
 /**
  * Base entity for all db entity objects in project.
@@ -6,4 +6,5 @@ package com.petpool.db.entity;
  * Required as it will be used for dao objects.
  */
 public abstract class Entity {
+
 }
