@@ -35,7 +35,7 @@ object DependencyVersions {
 plugins {
     java
     id("application")
-    id("org.springframework.boot").version("2.1.6.RELEASE")//TODO не получается передать туда переменную
+    id("org.springframework.boot").version("2.1.6.RELEASE")
     `maven-publish`
 }
 
