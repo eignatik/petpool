@@ -1,3 +1,5 @@
+import java.net.URI
+
 group = "com.petpool"
 version = "1.0-SNAPSHOT"
 
@@ -34,7 +36,10 @@ plugins {
     java
     id("application")
     id("org.springframework.boot").version("2.1.6.RELEASE")//TODO не получается передать туда переменную
+    `maven-publish`
 }
+
+
 
 apply(plugin = "io.spring.dependency-management")
 
@@ -76,8 +81,8 @@ dependencies {
 }
 
 configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_9
-    targetCompatibility = JavaVersion.VERSION_1_9
+    sourceCompatibility = JavaVersion.VERSION_12
+    targetCompatibility = JavaVersion.VERSION_12
 
 }
 
@@ -97,4 +102,18 @@ tasks.jar{
 }
 tasks.compileJava{
     this.options.encoding ="UTF-8"
+}
+
+val azureArtifactsGradleAccessToken: String by project
+
+publishing  {
+    repositories{
+        maven {
+            url = URI("https://pkgs.dev.azure.com/perfo-foundation/_packaging/petpool/maven/v1")
+            credentials {
+                username = "AZURE_ARTIFACTS"
+                password = System.getenv("AZURE_ARTIFACTS_ENV_ACCESS_TOKEN") ?: azureArtifactsGradleAccessToken
+            }
+        }
+    }
 }
