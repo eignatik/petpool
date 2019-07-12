@@ -111,7 +111,7 @@ publishing  {
         create<MavenPublication>("PetPool") {
             from(components["java"])
             version = appVersion.toString()
-            artifactId = "petpoll"
+            artifactId = "petpool"
         }
     }
 
