@@ -11,7 +11,7 @@ data class AppVersion(val major: Int, val minor: Int, val iter: Int){
 
 val mainClass = "com.petpool.Application"
 val appVersion = AppVersion(major = 0, minor = 0, iter = 1)
-val javaVersion = JavaVersion.VERSION_1_9
+val javaVersion = JavaVersion.VERSION_11
 val encoding = "UTF-8"
 
 object DependencyVersions {
@@ -81,8 +81,8 @@ dependencies {
 }
 
 configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
 
 }
 
@@ -107,7 +107,15 @@ tasks.compileJava{
 val azureArtifactsGradleAccessToken: String by project
 
 publishing  {
-    repositories{
+    publications {
+        create<MavenPublication>("PetPool") {
+            from(components["java"])
+            version = appVersion.toString()
+            artifactId = "petpoll"
+        }
+    }
+
+        repositories{
         maven {
             url = URI("https://pkgs.dev.azure.com/perfo-foundation/_packaging/petpool/maven/v1")
             credentials {
