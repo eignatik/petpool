@@ -1,4 +1,3 @@
-/target
 *.iml
 *.class
 *.jar
@@ -7,3 +6,5 @@
 /.idea
 out/
 .DC_Store
+/.gradle
+/build/
