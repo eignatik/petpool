@@ -30,6 +30,7 @@ object DependencyVersions {
     const val projectReactorVersion = "3.2.10.RELEASE"
     const val springBootVersion = "2.1.6.RELEASE"
     const val ormVersion = "5.1.8.RELEASE"
+    const val connectionPoolVersion = "2.6.0"
 }
 
 plugins {
@@ -78,6 +79,9 @@ dependencies {
     implementation ("org.springframework.boot:spring-boot-starter-web")
     implementation ("org.springframework.boot:spring-boot-starter-tomcat")
     implementation ("org.springframework","spring-orm",DependencyVersions.ormVersion)
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
+    implementation("org.apache.commons","commons-dbcp2",DependencyVersions.connectionPoolVersion)
+
 }
 
 configure<JavaPluginConvention> {

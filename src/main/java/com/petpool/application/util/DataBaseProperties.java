@@ -16,4 +16,9 @@ public class DataBaseProperties {
   private String hibernateSessionContextClass;
   private boolean hibernateShowSql;
   private String hibernateDialect;
+  private int poolMinIdle;
+  private int poolMaxIdle;
+  private int poolMaxTotal;
+
 }
+
