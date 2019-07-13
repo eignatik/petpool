@@ -5,6 +5,7 @@ import com.petpool.application.constants.HibernateAttrs;
 import com.petpool.application.util.DataBaseProperties;
 import com.petpool.application.util.EncryptionTool;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,17 +13,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 import javax.sql.DataSource;
 import java.util.Properties;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Slf4j
 @Configuration
 @PropertySource("environment.properties")
+@EnableTransactionManagement
 public class ApplicationConfig {
 
   private static final String DOMAIN_PACKAGE_TO_SCAN = "com.petpool.domain";
@@ -49,11 +51,14 @@ public class ApplicationConfig {
   @Bean
   public DataSource restDataSource(EncryptionTool encryptionTool,
       DataBaseProperties dataBaseProperties) {
-    DriverManagerDataSource dataSource = new DriverManagerDataSource();
+    BasicDataSource dataSource = new BasicDataSource();
     dataSource.setDriverClassName(dataBaseProperties.getDriverClass());
     dataSource.setUrl(dataBaseProperties.getUrl());
     dataSource.setUsername(dataBaseProperties.getName());
     dataSource.setPassword(encryptionTool.decrypt(dataBaseProperties.getPassword()));
+    dataSource.setMinIdle(dataBaseProperties.getPoolMinIdle());
+    dataSource.setMaxIdle(dataBaseProperties.getPoolMaxIdle());
+    dataSource.setMaxTotal(dataBaseProperties.getPoolMaxTotal());
     return dataSource;
   }
 
