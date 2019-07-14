@@ -7,7 +7,8 @@ public enum HibernateAttrs {
   URL("hibernate.connection.url"),
   CURRENT_SESSION_CONTEXT_CLASS("hibernate.current_session_context_class"),
   SHOW_SQL("hibernate.show_sql"),
-  DIALECT("hibernate.dialect");
+  DIALECT("hibernate.dialect"),
+  HIBERNATE_HBM_2DDL_AUTO("hibernate.hbm2ddl.auto");
 
   private String property;
 

@@ -1,5 +1,6 @@
 package com.petpool.application.util;
 
+import javax.annotation.PostConstruct;
 import lombok.Data;
 
 /**
@@ -16,9 +17,23 @@ public class DataBaseProperties {
   private String hibernateSessionContextClass;
   private boolean hibernateShowSql;
   private String hibernateDialect;
+  private String hibernateHbm2ddlAuto;
   private int poolMinIdle;
   private int poolMaxIdle;
   private int poolMaxTotal;
+  private LocalDataBaseProperties localDataBaseProperties;
+
+  public DataBaseProperties(LocalDataBaseProperties localDataBaseProperties) {
+    this.localDataBaseProperties = localDataBaseProperties;
+  }
+
+  @PostConstruct
+  private void fillWithLocalProperties() {
+    url = localDataBaseProperties.getUrl();
+    name = localDataBaseProperties.getName();
+    password = localDataBaseProperties.getPassword();
+    hibernateHbm2ddlAuto = localDataBaseProperties.getHibernateHbm2ddlAuto();
+  }
 
 }
 

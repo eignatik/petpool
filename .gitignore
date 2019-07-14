@@ -7,3 +7,5 @@ out/
 .DC_Store
 /.gradle
 /build/
+
+environment-local.properties
