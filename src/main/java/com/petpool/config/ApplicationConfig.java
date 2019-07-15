@@ -47,8 +47,6 @@ public class ApplicationConfig {
   @Value("${encryption.key}")
   private String encKey;
 
-  @Value("${useLocalDbProperties}")
-  private boolean useLocalDbProperties;
 
   @Bean
   public EncryptionTool encryptionTool() {
@@ -91,7 +89,7 @@ public class ApplicationConfig {
     dataSource.setDriverClassName(dataBaseProperties.getDriverClass());
     dataSource.setUrl(dataBaseProperties.getUrl());
     dataSource.setUsername(dataBaseProperties.getName());
-    dataSource.setPassword(useLocalDbProperties ?
+    dataSource.setPassword(dataBaseProperties.isUseLocalDbProperties() ?
         dataBaseProperties.getPassword() :
         encryptionTool.decrypt(dataBaseProperties.getPassword()));
     dataSource.setMinIdle(dataBaseProperties.getPoolMinIdle());
