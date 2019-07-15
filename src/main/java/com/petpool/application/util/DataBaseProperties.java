@@ -22,6 +22,7 @@ public class DataBaseProperties {
   private int poolMaxIdle;
   private int poolMaxTotal;
   private LocalDataBaseProperties localDataBaseProperties;
+  private boolean useLocalDbProperties;
 
   public DataBaseProperties(LocalDataBaseProperties localDataBaseProperties) {
     this.localDataBaseProperties = localDataBaseProperties;
@@ -29,10 +30,12 @@ public class DataBaseProperties {
 
   @PostConstruct
   private void fillWithLocalProperties() {
-    url = localDataBaseProperties.getUrl();
-    name = localDataBaseProperties.getName();
-    password = localDataBaseProperties.getPassword();
-    hibernateHbm2ddlAuto = localDataBaseProperties.getHibernateHbm2ddlAuto();
+    if(useLocalDbProperties){
+      url = localDataBaseProperties.getUrl();
+      name = localDataBaseProperties.getName();
+      password = localDataBaseProperties.getPassword();
+      hibernateHbm2ddlAuto = localDataBaseProperties.getHibernateHbm2ddlAuto();
+    }
   }
 
 }
