@@ -5,27 +5,39 @@ import com.petpool.application.constants.HibernateAttrs;
 import com.petpool.application.util.DataBaseProperties;
 import com.petpool.application.util.EncryptionTool;
 import com.petpool.application.util.LocalDataBaseProperties;
+import javax.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.SessionFactory;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 
+import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 import javax.sql.DataSource;
 import java.util.Properties;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.JpaVendorAdapter;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Slf4j
 @Configuration
 @PropertySource({"environment.properties", "environment-local.properties"})
+@EnableJpaRepositories(basePackages = {"com.petpool.domain.model"})
 @EnableTransactionManagement
 public class ApplicationConfig {
 
@@ -44,14 +56,31 @@ public class ApplicationConfig {
   }
 
   @Bean
-  public LocalSessionFactoryBean sessionFactory(
+  public EntityManagerFactory entityManagerFactory(
+      LocalContainerEntityManagerFactoryBean factoryBean) {
+    return factoryBean.getNativeEntityManagerFactory();
+  }
+
+  @Bean
+  @Primary
+  LocalContainerEntityManagerFactoryBean factoryBean(
       DataSource restDataSource,
-      Properties hibernateProperties) {
-    LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-    sessionFactory.setDataSource(restDataSource);
-    sessionFactory.setPackagesToScan(DOMAIN_PACKAGE_TO_SCAN);
-    sessionFactory.setHibernateProperties(hibernateProperties);
-    return sessionFactory;
+      Properties hibernateProperties,
+      JpaVendorAdapter jpaVendorAdapter,
+      HibernateJpaDialect hibernateJpaDialect) {
+    LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+    factoryBean.setPackagesToScan(DOMAIN_PACKAGE_TO_SCAN);
+    factoryBean.setDataSource(restDataSource);
+    factoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
+    factoryBean.setJpaProperties(hibernateProperties);
+    factoryBean.setJpaVendorAdapter(jpaVendorAdapter);
+    factoryBean.setJpaDialect(hibernateJpaDialect);
+    return factoryBean;
+  }
+
+  @Bean
+  public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
+    return new PersistenceExceptionTranslationPostProcessor();
   }
 
   @Bean
@@ -72,9 +101,18 @@ public class ApplicationConfig {
   }
 
   @Bean
-  @Autowired
-  public HibernateTransactionManager transactionManager(SessionFactory factory) {
-    return new HibernateTransactionManager(factory);
+  public JpaVendorAdapter jpaVendorAdapter() {
+    return new HibernateJpaVendorAdapter();
+  }
+
+  @Bean
+  public HibernateJpaDialect hibernateJpaDialect() {
+    return new HibernateJpaDialect();
+  }
+
+  @Bean
+  public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+    return new JpaTransactionManager(entityManagerFactory);
   }
 
   @Bean

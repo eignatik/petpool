@@ -15,7 +15,7 @@ val javaVersion = JavaVersion.VERSION_11
 val encoding = "UTF-8"
 
 object DependencyVersions {
-    const val hibernateVersion = "5.4.2.Final"
+    const val hibernateVersion = "5.4.3.Final"
     const val jdbcDriverVersion = "8.0.16"
     const val commonLangVersion = "3.8.1"
     const val collectionUtilsVersion = "4.3"
@@ -70,6 +70,8 @@ dependencies {
     implementation("io.projectreactor", "reactor-core", DependencyVersions.projectReactorVersion)
 
     implementation ("org.hibernate","hibernate-core",DependencyVersions.hibernateVersion)
+    implementation ("org.hibernate","hibernate-entitymanager",DependencyVersions.hibernateVersion)
+
     implementation ("mysql","mysql-connector-java",DependencyVersions.jdbcDriverVersion)
     implementation ("org.apache.commons","commons-lang3",DependencyVersions.commonLangVersion)
     implementation ("org.apache.commons","commons-collections4",DependencyVersions.collectionUtilsVersion)
@@ -78,6 +80,8 @@ dependencies {
 
     implementation ("org.springframework.boot:spring-boot-starter-web")
     implementation ("org.springframework.boot:spring-boot-starter-tomcat")
+    implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
+
     implementation ("org.springframework","spring-orm",DependencyVersions.ormVersion)
     implementation("org.apache.commons","commons-dbcp2",DependencyVersions.connectionPoolVersion)
 
