@@ -38,6 +38,7 @@ plugins {
     id("application")
     id("org.springframework.boot").version("2.1.6.RELEASE")
     `maven-publish`
+    id("org.sonarqube").version("2.7")
 }
 
 
