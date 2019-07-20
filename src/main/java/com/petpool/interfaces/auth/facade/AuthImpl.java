@@ -1,11 +1,12 @@
-package com.petpool.interfaces.authorization.facade;
+package com.petpool.interfaces.auth.facade;
 
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
-public class AuthImpl implements AuthorizationFacade {
+@Component
+public class AuthImpl implements AuthFacade {
 
   private final UserService userService;
 
@@ -23,4 +24,5 @@ public class AuthImpl implements AuthorizationFacade {
   public User findById(Long id) {
     return userService.findById(id);
   }
+
 }

@@ -1,14 +1,13 @@
 package com.petpool.config;
 
 import com.petpool.application.constants.HibernateAttrs;
-import com.petpool.application.impl.UserServiceImpl;
 import com.petpool.application.util.DataBaseProperties;
 import com.petpool.application.util.EncryptionTool;
 import com.petpool.application.util.LocalDataBaseProperties;
-import com.petpool.domain.model.user.UserRepository;
 import com.petpool.domain.service.UserService;
-import com.petpool.interfaces.authorization.facade.AuthImpl;
-import com.petpool.interfaces.authorization.facade.AuthorizationFacade;
+import com.petpool.domain.shared.DataBaseInitializer;
+import com.petpool.interfaces.auth.facade.AuthFacade;
+import com.petpool.interfaces.auth.facade.AuthImpl;
 import javax.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @PropertySource({"environment.properties", "environment-local.properties"})
 @EnableJpaRepositories(basePackages = {"com.petpool.domain.model"})
 @EnableTransactionManagement
+@ComponentScan({"com.petpool"})
 public class ApplicationConfig {
 
   private static final String DOMAIN_PACKAGE_TO_SCAN = "com.petpool.domain";
@@ -49,14 +50,12 @@ public class ApplicationConfig {
   @Value("${encryption.key}")
   private String encKey;
 
+  @Autowired
+  private DataBaseInitializer dbInitializer;
+
   @EventListener(ApplicationReadyEvent.class)
   public void doSomethingAfterStartup() {
-    log.info("hello world, I have just started up");
-  }
-
-  @Bean
-  public AuthorizationFacade authorizationFacade(UserService userService) {
-    return new AuthImpl(userService);
+    dbInitializer.init();
   }
 
   @Bean

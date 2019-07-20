@@ -1,34 +1,19 @@
 package com.petpool.domain.model.user;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import lombok.Data;
+public enum UserType {
+  ADMIN("ADMIN"),
+  USER("USER"),
+  NOT_APPROVED("NOT_APPROVED"),
+  BANNED("BANNED"),
+  DELETED("DELETED");
 
-@Data
-@Entity
-@Table(name = "user_type")
-public class UserType {
+  private String value;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
-
-  @Enumerated(EnumType.STRING)
-  @Column(name = "user_type", unique = true, nullable = false)
-  private UserTypes userType;
-
-  public UserType() {
-
+  UserType(String value) {
+    this.value = value;
   }
 
-  public UserType(UserTypes userType) {
-    this.userType = userType;
+  public String getValue() {
+    return value;
   }
-
 }

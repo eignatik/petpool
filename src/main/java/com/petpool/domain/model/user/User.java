@@ -34,19 +34,19 @@ public class User {
   private Date lastLogin;
 
   @OneToMany(cascade = CascadeType.ALL)
-  private Set<UserType> userType;
+  private Set<Role> roles;
 
   public User() {
 
   }
 
   public User(String userName, String passwordHash, String email, Date lastLogin,
-      Set<UserType> userType) {
+      Set<Role> roles) {
     this.userName = userName;
     this.passwordHash = passwordHash;
     this.email = email;
     this.lastLogin = lastLogin;
-    this.userType = userType;
+    this.roles = roles;
   }
 
 }

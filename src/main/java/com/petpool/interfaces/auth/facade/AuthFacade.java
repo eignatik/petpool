@@ -1,8 +1,8 @@
-package com.petpool.interfaces.authorization.facade;
+package com.petpool.interfaces.auth.facade;
 
 import com.petpool.domain.model.user.User;
 
-public interface AuthorizationFacade {
+public interface AuthFacade {
 
   User createNewUser(User user);
 
