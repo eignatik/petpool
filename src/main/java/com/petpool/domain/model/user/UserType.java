@@ -7,7 +7,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.Data;
 
@@ -20,12 +19,13 @@ public class UserType {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  @OneToOne(mappedBy = "userType")
-  private User user;
-
   @Enumerated(EnumType.STRING)
-  @Column(name = "user_type")
+  @Column(name = "user_type", unique = true, nullable = false)
   private UserTypes userType;
+
+  public UserType() {
+
+  }
 
   public UserType(UserTypes userType) {
     this.userType = userType;
