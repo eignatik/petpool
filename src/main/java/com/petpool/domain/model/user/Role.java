@@ -8,16 +8,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import com.petpool.domain.shared.BaseEntity;
 import lombok.Data;
 
 @Data
-@Entity
 @Table(name = "role")
-public class Role {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
+public class Role extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "user_type", unique = true, nullable = false)

@@ -10,16 +10,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.petpool.domain.shared.BaseEntity;
 import lombok.Data;
 
 @Data
-@Entity
 @Table(name = "user")
-public class User {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
+public class User  extends BaseEntity {
 
   @Column(name = "user_name", unique = true, nullable = false, length = 20)
   private String userName;
@@ -32,6 +29,9 @@ public class User {
 
   @Column(name = "last_login")
   private Date lastLogin;
+
+  @OneToMany(cascade = CascadeType.ALL)
+  private Set<Token> tokens;
 
   @OneToMany(cascade = CascadeType.ALL)
   private Set<Role> roles;

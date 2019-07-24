@@ -15,6 +15,7 @@ val javaVersion = JavaVersion.VERSION_11
 val encoding = "UTF-8"
 
 object DependencyVersions {
+    const val jwtVersion = "0.10.7"
     const val hibernateVersion = "5.4.3.Final"
     const val jdbcDriverVersion = "8.0.16"
     const val commonLangVersion = "3.8.1"
@@ -86,6 +87,10 @@ dependencies {
     
     implementation ("org.springframework","spring-orm",DependencyVersions.ormVersion)
     implementation("org.apache.commons","commons-dbcp2",DependencyVersions.connectionPoolVersion)
+
+    implementation ("io.jsonwebtoken","jjwt-api", DependencyVersions.jwtVersion)
+    implementation ("io.jsonwebtoken","jjwt-impl", DependencyVersions.jwtVersion)
+    implementation ("io.jsonwebtoken","jjwt-jackson", DependencyVersions.jwtVersion)
 
 }
 
