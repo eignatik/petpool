@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,12 +45,16 @@ public class AuthImpl implements AuthFacade {
   }
 
   @Override
-  public Optional<Map<String, String>> requestTokenForUser(String name, String password,
+  public Optional<Map<String, String>> requestTokenForUser(Credentials credentials,
       String userAgent) {
-    return userService
-        .findByName(name)
+    Optional<User> foundedUser;
+
+    if(!credentials.getEmail().isEmpty()) foundedUser = userService.findByEmail(credentials.getEmail());
+    else foundedUser = userService.findByName(credentials.getName());
+
+    return foundedUser
         .map(user -> {
-          if (checkPassword(password, user.getPasswordHash())) {
+          if (checkPassword(credentials.getPassword(), user.getPasswordHash())) {
             return user;
           } else {
             return null;
@@ -120,7 +125,7 @@ public class AuthImpl implements AuthFacade {
     String accessToken =
         user.getId() + ":" + expired.getTime() + ":" +  user.getRoles().stream()
             .map(r -> r.getUserType().getValue()).collect(
-                Collectors.joining());
+                Collectors.joining(","));
 
     String refreshToken = UUID.randomUUID().toString();
 

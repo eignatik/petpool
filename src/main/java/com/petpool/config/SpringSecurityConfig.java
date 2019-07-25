@@ -53,7 +53,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   public void configure(final WebSecurity webSecurity) {
-    webSecurity.ignoring().antMatchers("/token/**");
+    webSecurity.ignoring().antMatchers("/token/**", "/health");
   }
 
   @Override
@@ -86,6 +86,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .requestMatchers(PUBLIC_API_URL).permitAll()
         .requestMatchers(PRIVATE_API_URL).authenticated()
         .requestMatchers(ADMIN_API_URL).hasRole(UserType.ADMIN.getValue())
+        .anyRequest().denyAll()
         .and()
         .formLogin().disable()
         .httpBasic().disable()

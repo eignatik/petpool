@@ -6,6 +6,7 @@ import com.petpool.domain.model.user.Role;
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.service.UserService;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -56,10 +57,10 @@ public class AuthenticationTokenProvider extends AbstractUserDetailsAuthenticati
       throws AuthenticationException {
 
     String tokenStr = String.valueOf(usernamePasswordAuthenticationToken.getCredentials());
-    if (!tokenVerefication(tokenStr)) {
+    if (!tokenVerification(tokenStr)) {
       throw new TokenAuthException("Token is invalid!");
     }
-    TokenRepresentation token = parseToken(tokenStr);
+    TokenRepresentation token = parseToken(tokenStr).orElseThrow(() -> new TokenAuthException("Token is not correct!"));
     if (!checkTokenExpiration(token)) {
       throw new TokenAuthException("Token expired!");
     }
@@ -85,23 +86,28 @@ public class AuthenticationTokenProvider extends AbstractUserDetailsAuthenticati
   }
 
 
-  private TokenRepresentation parseToken(String token) {
-    return new TokenRepresentation(1, "qweqwe", new Date(System.currentTimeMillis()));
+  private Optional<TokenRepresentation> parseToken(String token) {
+    String[] split = token.split(":");
+    if(split.length<3) return Optional.empty();
+    long userID= Long.parseLong(split[0]);
+    long expired = Long.parseLong(split[1]);
+
+    return userService.findById(userID)
+        .map(user-> new TokenRepresentation(user.getId(), user.getUserName(), new Date(expired)));
+
   }
 
-  private boolean tokenVerefication(String token) {
+  private boolean tokenVerification(String token) {
     return true;
   }
 
   private boolean checkTokenExpiration(TokenRepresentation token) {
-    //проверим даты из токера и текущей
-    return true;
+    return token.getExpired().after(new Date(System.currentTimeMillis()));
   }
 
   @Data
   @AllArgsConstructor
   private static class TokenRepresentation {
-
     private long userID;
     private String userName;
     private Date expired;
