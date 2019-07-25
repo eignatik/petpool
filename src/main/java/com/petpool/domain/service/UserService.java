@@ -1,6 +1,7 @@
 package com.petpool.domain.service;
 
 import com.petpool.domain.model.user.Role;
+import com.petpool.domain.model.user.Token;
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.model.user.UserType;
 import java.util.List;
@@ -8,20 +9,26 @@ import java.util.Optional;
 
 public interface UserService {
 
-  User createUser(User user);
+  User saveUser(User user);
 
   Optional<User> findById(Long id);
 
-  Optional<User> findByLogin(String login);
+  Optional<User> findByName(String login);
 
   Optional<User> findByEmail(String email);
 
-  Optional<Role> findRoleByType(UserType userType);
-
   Optional<User> findByNameAndPassword(String name, String password);
+
+  Optional<User> findUserByToken(String token);
+
+  Optional<Role> findRoleByType(UserType userType);
 
   List<Role> findAllRoles();
 
   List<Role> saveAllRoles(List<Role> roles);
+
+  Token saveToken(Token token);
+
+  Optional<Token> findTokenByRefreshToken(String token);
 
 }

@@ -10,6 +10,7 @@ public interface AuthFacade {
 
   Optional<User> findById(Long id);
 
-  Optional<Map<String, String>> requestTokenForUser(String name, String password);
+  Optional<Map<String, String>> requestTokenForUser(String name, String password, String userAgent);
 
+  Optional<Map<String, String>> refreshTokenForUser(String refreshToken, String userAgent);
 }

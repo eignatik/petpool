@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TokenRepository extends JpaRepository<Token, Long> {
 
-  Optional<Token> findOneByToken(String token);
+  Optional<Token> findByToken(String token);
   List<Token> findAllByExpiredBefore(Date date);
 
 }

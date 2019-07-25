@@ -9,11 +9,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 @Entity
 @Table(name = "token")
 public class Token{
@@ -51,4 +49,15 @@ public class Token{
 
   }
 
+  public Token( String token, Date expired, Date created, String ip,
+      String userAgent, String os, String browser, User user) {
+    this.token = token;
+    this.expired = expired;
+    this.created = created;
+    this.ip = ip;
+    this.userAgent = userAgent;
+    this.os = os;
+    this.browser = browser;
+    this.user = user;
+  }
 }

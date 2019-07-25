@@ -40,7 +40,7 @@ public class User{
   @Column(name = "last_login")
   private Date lastLogin;
 
-  @OneToMany(fetch = FetchType.LAZY)
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinTable(
       name="user_tokens",
       joinColumns = @JoinColumn( name="user_id"),
