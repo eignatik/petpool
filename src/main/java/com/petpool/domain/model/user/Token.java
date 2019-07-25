@@ -9,8 +9,16 @@ import java.util.Date;
 
 @Data
 @AllArgsConstructor
+@Entity
 @Table(name = "token")
-public class Token extends BaseEntity {
+public class Token{
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
+
+  @Version
+  private Long version;
 
   @Column(name = "refresh_token", unique = true, nullable = false)
   private String token;

@@ -82,7 +82,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .authenticationProvider(authProvider)
         .addFilterBefore(authenticationFilter(), AnonymousAuthenticationFilter.class)
-        .authorizeRequests().anyRequest().authenticated()
+        .authorizeRequests()//.anyRequest().authenticated()
         .requestMatchers(PUBLIC_API_URL).permitAll()
         .requestMatchers(PRIVATE_API_URL).authenticated()
         .requestMatchers(ADMIN_API_URL).hasRole(UserType.ADMIN.getValue())
@@ -105,9 +105,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     return new HttpStatusEntryPoint(HttpStatus.FORBIDDEN);
   }
 
-  @Bean
-  public PasswordEncoder encoder() {
-    return new BCryptPasswordEncoder(4);
-  }
+
 
 }

@@ -12,12 +12,20 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.petpool.domain.shared.BaseEntity;
+import javax.persistence.Version;
 import lombok.Data;
 
 @Data
+@Entity
 @Table(name = "user")
-public class User  extends BaseEntity {
+public class User{
 
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
+
+  @Version
+  private Long version;
   @Column(name = "user_name", unique = true, nullable = false, length = 20)
   private String userName;
 

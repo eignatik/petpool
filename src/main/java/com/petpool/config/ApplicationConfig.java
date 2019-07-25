@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 
@@ -34,6 +35,8 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Slf4j
@@ -41,7 +44,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @PropertySource({"environment.properties", "environment-local.properties"})
 @EnableJpaRepositories(basePackages = {"com.petpool.domain.model"})
 @EnableTransactionManagement
-@ComponentScan({"com.petpool"})
+@Import({SpringSecurityConfig.class})
 public class ApplicationConfig {
 
   private static final String DOMAIN_PACKAGE_TO_SCAN = "com.petpool.domain";
@@ -49,6 +52,14 @@ public class ApplicationConfig {
 
   @Value("${encryption.key}")
   private String encKey;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  @Bean
+  public PasswordEncoder encoder() {
+    return new BCryptPasswordEncoder(4);
+  }
 
   @Autowired
   private DataBaseInitializer dbInitializer;

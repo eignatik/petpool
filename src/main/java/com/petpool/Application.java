@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
 
 @Slf4j
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
-@Import({ApplicationConfig.class, SpringSecurityConfig.class})
+@Import({ApplicationConfig.class})
 @EnableConfigurationProperties
 public class Application {
 

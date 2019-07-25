@@ -10,11 +10,20 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.petpool.domain.shared.BaseEntity;
+import javax.persistence.Version;
 import lombok.Data;
 
 @Data
+@Entity
 @Table(name = "role")
-public class Role extends BaseEntity {
+public class Role {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
+
+  @Version
+  private Long version;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "user_type", unique = true, nullable = false)
