@@ -1,7 +1,5 @@
 package com.petpool.interfaces.auth;
 
-import static java.util.Optional.empty;
-
 import com.petpool.interfaces.auth.facade.AuthFacade;
 import com.petpool.interfaces.auth.facade.AuthFacade.Credentials;
 import java.util.Map;

@@ -1,5 +1,6 @@
 package com.petpool.interfaces.auth.facade;
 
+import com.petpool.application.constants.TokenAttributes;
 import com.petpool.domain.model.user.Token;
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.service.UserService;
@@ -10,14 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthImpl implements AuthFacade {
+public class AuthFacadeImpl implements AuthFacade {
 
   private final UserService userService;
 
@@ -30,18 +31,8 @@ public class AuthImpl implements AuthFacade {
   }
 
   @Autowired
-  public AuthImpl(UserService userService) {
+  public AuthFacadeImpl(UserService userService) {
     this.userService = userService;
-  }
-
-  @Override
-  public User createNewUser(User user) {
-    return userService.saveUser(user);
-  }
-
-  @Override
-  public Optional<User> findById(Long id) {
-    return userService.findById(id);
   }
 
   @Override
@@ -49,8 +40,11 @@ public class AuthImpl implements AuthFacade {
       String userAgent) {
     Optional<User> foundedUser;
 
-    if(!credentials.getEmail().isEmpty()) foundedUser = userService.findByEmail(credentials.getEmail());
-    else foundedUser = userService.findByName(credentials.getName());
+    if (!StringUtils.isEmpty(credentials.getEmail())) {
+      foundedUser = userService.findByEmail(credentials.getEmail());
+    } else {
+      foundedUser = userService.findByName(credentials.getName());
+    }
 
     return foundedUser
         .map(user -> {
@@ -77,12 +71,12 @@ public class AuthImpl implements AuthFacade {
 
   private Map<String, String> generateToken(User user, String userAgent, String ip) {
 
-    Date newExpired = buildExpiredDate();
-    Map<String, String> res = buildNewTokens(user, newExpired);
+    Date expirationDate = createExpirationDate();
+    Map<String, String> res = buildNewTokens(user, expirationDate);
 
     Token token = new Token(
-        res.get("refreshToken"),
-        newExpired,
+        res.get(TokenAttributes.REFRESH_TOKEN),
+        expirationDate,
         new Date(System.currentTimeMillis()),
         ip,
         userAgent,
@@ -97,7 +91,7 @@ public class AuthImpl implements AuthFacade {
   }
 
   private Map<String, String> updateToken(Token token, String userAgent, String ip) {
-    Date newExpired = buildExpiredDate();
+    Date newExpired = createExpirationDate();
 
     Map<String, String> res = buildNewTokens(token.getUser(), newExpired);
 
@@ -106,24 +100,24 @@ public class AuthImpl implements AuthFacade {
     token.setUserAgent(userAgent);
     token.setOs(osFromUserAgent(userAgent));
     token.setExpired(newExpired);
-    token.setToken(res.get("refreshToken"));
+    token.setToken(res.get(TokenAttributes.REFRESH_TOKEN));
 
     userService.saveToken(token);
 
     return res;
   }
 
-  private Date buildExpiredDate(){
-    Calendar c = Calendar.getInstance();
-    c.setTimeInMillis(System.currentTimeMillis());
-    c.add(Calendar.WEEK_OF_MONTH, 1);
-    return c.getTime();
+  private Date createExpirationDate() {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTimeInMillis(System.currentTimeMillis());
+    calendar.add(Calendar.MONTH, 1);
+    return calendar.getTime();
   }
 
-  private Map<String, String> buildNewTokens(User user, Date expired){
-
+  private Map<String, String> buildNewTokens(User user, Date expired) {
+    //TODO: temporal stub for access token, switch with JWT
     String accessToken =
-        user.getId() + ":" + expired.getTime() + ":" +  user.getRoles().stream()
+        user.getId() + ":" + expired.getTime() + ":" + user.getRoles().stream()
             .map(r -> r.getUserType().getValue()).collect(
                 Collectors.joining(","));
 
@@ -131,11 +125,11 @@ public class AuthImpl implements AuthFacade {
 
     Map<String, String> map = new HashMap<>();
 
-    map.put("accessToken",
+    map.put(TokenAttributes.ACCESS_TOKEN,
         Base64.getEncoder().encodeToString(accessToken.getBytes()));
-    map.put("refreshToken",
+    map.put(TokenAttributes.REFRESH_TOKEN,
         Base64.getEncoder().encodeToString(refreshToken.getBytes()));
-    map.put("expired", String.valueOf(expired.getTime()));
+    map.put(TokenAttributes.EXPIRED, String.valueOf(expired.getTime()));
     return map;
   }
 
