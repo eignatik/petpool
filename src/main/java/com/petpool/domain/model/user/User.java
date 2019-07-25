@@ -5,9 +5,13 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -36,10 +40,20 @@ public class User{
   @Column(name = "last_login")
   private Date lastLogin;
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name="user_tokens",
+      joinColumns = @JoinColumn( name="user_id"),
+      inverseJoinColumns = @JoinColumn( name="token_id")
+  )
   private Set<Token> tokens;
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+      name="user_roles",
+      joinColumns = @JoinColumn( name="user_id"),
+      inverseJoinColumns = @JoinColumn( name="role_id")
+  )
   private Set<Role> roles;
 
   public User() {
