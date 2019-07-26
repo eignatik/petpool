@@ -4,6 +4,11 @@ import com.petpool.application.constants.TokenAttributes;
 import com.petpool.domain.model.user.Token;
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.service.UserService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
@@ -12,8 +17,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.crypto.SecretKey;
+import javax.swing.text.html.Option;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +31,13 @@ public class AuthFacadeImpl implements AuthFacade {
   private final UserService userService;
 
   private PasswordEncoder passwordEncoder;
+
+  private Key jwtKey;
+
+  @Autowired
+  public void setJwtKey(Key jwtKey){
+    this.jwtKey = jwtKey;
+  }
 
   @Autowired
   public void setPasswordEncoder(
@@ -57,16 +72,27 @@ public class AuthFacadeImpl implements AuthFacade {
         .map(user -> generateToken(user, userAgent, "1.1.1.1"));
   }
 
-  //TODO: проверять дату окончания токена, если не соответствует, то нужно заново залогиниться
+  //TODO: если токен просрочен, то нужно как-то сообщить юзеру об этом или просто заставим его получить новый
   @Override
   public Optional<Map<String, String>> refreshTokenForUser(String refreshToken, String userAgent) {
     return userService
         .findTokenByRefreshToken(refreshToken)
+        .flatMap(token->{
+          if (checkRefreshTokenNotExpired(token)) {
+            return Optional.of(token);
+          }
+          userService.removeToken(token);
+          return Optional.empty();
+        })
         .map(token -> updateToken(token, userAgent, "1.1.1.1"));
   }
 
   private boolean checkPassword(String password, String encodedPassword) {
     return passwordEncoder.matches(password, encodedPassword);
+  }
+
+  private boolean checkRefreshTokenNotExpired(Token token){
+    return token.getExpired().after(new Date(System.currentTimeMillis()));
   }
 
   private Map<String, String> generateToken(User user, String userAgent, String ip) {
@@ -110,25 +136,33 @@ public class AuthFacadeImpl implements AuthFacade {
   private Date createExpirationDate() {
     Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(System.currentTimeMillis());
-    calendar.add(Calendar.MONTH, 1);
+    calendar.add(Calendar.HOUR, 1);
     return calendar.getTime();
   }
 
   private Map<String, String> buildNewTokens(User user, Date expired) {
-    //TODO: temporal stub for access token, switch with JWT
-    String accessToken =
-        user.getId() + ":" + expired.getTime() + ":" + user.getRoles().stream()
-            .map(r -> r.getUserType().getValue()).collect(
-                Collectors.joining(","));
+
+    String roles = user.getRoles().stream()
+        .map(r -> r.getUserType().getValue())
+        .collect(Collectors.joining(","));
+
+    Claims claims = Jwts.claims();
+    claims.put("user_id",user.getId());
+    claims.put("roles", roles);
+
+    String accessToken =  Jwts.builder()
+        .setExpiration(expired)
+        .signWith(jwtKey)
+        .setSubject("petpool service")
+        .setClaims(claims)
+        .compact();
 
     String refreshToken = UUID.randomUUID().toString();
 
     Map<String, String> map = new HashMap<>();
 
-    map.put(TokenAttributes.ACCESS_TOKEN,
-        Base64.getEncoder().encodeToString(accessToken.getBytes()));
-    map.put(TokenAttributes.REFRESH_TOKEN,
-        Base64.getEncoder().encodeToString(refreshToken.getBytes()));
+    map.put(TokenAttributes.ACCESS_TOKEN, accessToken);
+    map.put(TokenAttributes.REFRESH_TOKEN, Base64.getEncoder().encodeToString(refreshToken.getBytes()));
     map.put(TokenAttributes.EXPIRED, String.valueOf(expired.getTime()));
     return map;
   }
@@ -140,4 +174,6 @@ public class AuthFacadeImpl implements AuthFacade {
   private String browserFromUserAgent(String userAgent) {
     return "firefox";
   }
+
+
 }

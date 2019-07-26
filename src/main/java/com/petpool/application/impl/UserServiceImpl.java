@@ -85,5 +85,10 @@ public class UserServiceImpl implements UserService {
       return tokenRepository.save(token);
   }
 
+  @Override
+  public void removeToken(Token token) {
+    tokenRepository.delete(token);
+  }
+
 }
 

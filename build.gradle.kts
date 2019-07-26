@@ -1,4 +1,9 @@
 import java.net.URI
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.security.Keys
+import java.util.Base64
+import javax.crypto.SecretKey
 
 group = "com.petpool"
 version = "1.0-SNAPSHOT"
@@ -42,6 +47,17 @@ plugins {
     id("org.sonarqube").version("2.7")
 }
 
+
+buildscript{
+    repositories {
+        mavenCentral()
+    }
+    dependencies{
+        classpath ("io.jsonwebtoken","jjwt-api", "0.10.7")
+        classpath ("io.jsonwebtoken","jjwt-impl", "0.10.7")
+        classpath ("io.jsonwebtoken","jjwt-jackson", "0.10.7")
+    }
+}
 
 
 apply(plugin = "io.spring.dependency-management")
@@ -136,6 +152,15 @@ publishing  {
                 username = "AZURE_ARTIFACTS"
                 password = System.getenv("AZURE_ARTIFACTS_ENV_ACCESS_TOKEN") ?: azureArtifactsGradleAccessToken
             }
+        }
+    }
+
+
+    tasks.register("generate_jwt_key") {
+        doLast {
+            val key = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+            val storedKey = Base64.getEncoder().encodeToString(key.encoded)
+            print("JWT-key for config property: $storedKey")
         }
     }
 }

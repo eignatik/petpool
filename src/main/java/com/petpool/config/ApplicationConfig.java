@@ -5,6 +5,9 @@ import com.petpool.application.util.DataBaseProperties;
 import com.petpool.application.util.EncryptionTool;
 import com.petpool.application.util.LocalDataBaseProperties;
 import com.petpool.domain.shared.DataBaseInitializer;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.util.Base64;
 import javax.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -48,6 +51,14 @@ public class ApplicationConfig {
 
   @Value("${encryption.key}")
   private String encKey;
+
+  @Value("${encryption.key.jwt}")
+  private String encKeyJwt;
+
+  @Bean
+  public Key jwtKey(){
+    return Keys.hmacShaKeyFor(Base64.getDecoder().decode(encKeyJwt));
+  }
 
   @Autowired
   private PasswordEncoder passwordEncoder;

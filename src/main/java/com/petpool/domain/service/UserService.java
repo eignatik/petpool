@@ -29,6 +29,8 @@ public interface UserService {
 
   Token saveToken(Token token);
 
+  void removeToken(Token token);
+
   Optional<Token> findTokenByRefreshToken(String token);
 
 }
