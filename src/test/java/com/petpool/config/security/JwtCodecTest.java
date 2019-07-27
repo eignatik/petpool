@@ -50,8 +50,8 @@ public class JwtCodecTest {
 
     Date expirationDate = JwtCodec.createExpirationDate(100);
     long delta = expirationDate.getTime() - System.currentTimeMillis();
-    long expiration = 100*60*1000;
+    long expiration = 100 * 60 * 1000;
 
-    assertTrue(expiration-delta >=0 && expiration-delta < 1000*2L);
+    assertTrue(expiration - delta >= 0 && expiration - delta < 1000 * 2L);
   }
 }

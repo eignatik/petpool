@@ -19,11 +19,10 @@ import org.springframework.stereotype.Component;
 public class AuthenticationTokenProvider extends AbstractUserDetailsAuthenticationProvider {
 
 
-
   private JwtCodec jwtCodec;
 
   @Autowired
-  public void setJwtCodec(JwtCodec jwtCodec){
+  public void setJwtCodec(JwtCodec jwtCodec) {
     this.jwtCodec = jwtCodec;
   }
 
@@ -35,37 +34,30 @@ public class AuthenticationTokenProvider extends AbstractUserDetailsAuthenticati
   }
 
   /**
-   *
-   *
    * <p>The function retrieveUser return correct authorized user in specific format UserDetails</p>
    *
    * @see UserDetails
-   *
-   * @param userName
-   * @param usernamePasswordAuthenticationToken
-   * @return
-   * @throws AuthenticationException
    */
   @Override
   protected UserDetails retrieveUser(String userName,
       UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken)
       throws AuthenticationException {
 
-   String tokenStr = String.valueOf(usernamePasswordAuthenticationToken.getCredentials());
+    String tokenStr = String.valueOf(usernamePasswordAuthenticationToken.getCredentials());
 
     Payload payload;
     try {
-       payload = jwtCodec.parseToken(tokenStr);
+      payload = jwtCodec.parseToken(tokenStr);
     } catch (InvalidPayloadTokenException e) {
-         throw new TokenAuthException("Invalid token's payload", e);
+      throw new TokenAuthException("Invalid token's payload", e);
     } catch (InvalidSignatureTokenException e) {
       throw new TokenAuthException("Invalid token's signature", e);
     } catch (ExpirationTokenException e) {
       throw new TokenAuthException("Token id expired", e);
-    }catch (Exception e){
+    } catch (Exception e) {
       throw new TokenAuthException("Other token's parser exception");
     }
-    return new AuthorizedUser( payload.getUserId(), payload.getRoles());
+    return new AuthorizedUser(payload.getUserId(), payload.getRoles());
 
   }
 }

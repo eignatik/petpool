@@ -31,22 +31,30 @@ public class AuthorizedUser implements UserDetails {
     return roles;
   }
 
-  public boolean hasRole(UserType role){
-      return roles.contains(role);
+  public boolean hasRole(UserType role) {
+    return roles.contains(role);
   }
 
-  public boolean hasAnyRoles(UserType ... roles){
-    if(roles.length==0) return false;
+  public boolean hasAnyRoles(UserType... roles) {
+    if (roles.length == 0) {
+      return false;
+    }
     for (UserType role : roles) {
-        if(this.roles.contains(role)) return true;
+      if (this.roles.contains(role)) {
+        return true;
+      }
     }
     return false;
   }
 
-  public boolean hasAllRoles(UserType ... roles){
-    if(roles.length==0) return false;
+  public boolean hasAllRoles(UserType... roles) {
+    if (roles.length == 0) {
+      return false;
+    }
     for (UserType role : roles) {
-      if(!this.roles.contains(role)) return false;
+      if (!this.roles.contains(role)) {
+        return false;
+      }
     }
     return true;
   }
@@ -87,7 +95,7 @@ public class AuthorizedUser implements UserDetails {
     return !userIsBannedOrDeleted();
   }
 
-  private boolean userIsBannedOrDeleted(){
-    return roles.contains(UserType.BANNED)||  roles.contains(UserType.DELETED);
+  private boolean userIsBannedOrDeleted() {
+    return roles.contains(UserType.BANNED) || roles.contains(UserType.DELETED);
   }
 }
