@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import lombok.Data;
 
@@ -26,8 +28,10 @@ public class Token{
   @Column(name = "refresh_token", unique = true, nullable = false)
   private String token;
 
+  @Temporal(value = TemporalType.DATE)
   private Date expired;
 
+  @Temporal(value = TemporalType.DATE)
   private Date created;
 
   @Column(nullable = false)

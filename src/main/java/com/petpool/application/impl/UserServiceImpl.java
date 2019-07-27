@@ -8,6 +8,7 @@ import com.petpool.domain.model.user.UserRepository;
 import com.petpool.domain.model.user.RoleRepository;
 import com.petpool.domain.model.user.UserType;
 import com.petpool.domain.service.UserService;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,11 @@ public class UserServiceImpl implements UserService {
   @Override
   public Optional<Token> findTokenByRefreshToken(String token) {
     return tokenRepository.findByToken(token);
+  }
+
+  @Override
+  public void deleteExpiredTokens(User user) {
+    tokenRepository.deleteByExpiredBeforeAndAndUser(new Date(), user);
   }
 
   @Override

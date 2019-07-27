@@ -33,4 +33,6 @@ public interface UserService {
 
   Optional<Token> findTokenByRefreshToken(String token);
 
+  void deleteExpiredTokens(User user);
+
 }

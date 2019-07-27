@@ -3,6 +3,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import java.util.Base64
+import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 
 group = "com.petpool"
@@ -163,4 +164,16 @@ publishing  {
             print("JWT-key for config property: $storedKey")
         }
     }
+
+    tasks.register("generate_aes_key") {
+        doLast {
+            val keyGen = KeyGenerator.getInstance("AES")
+            keyGen.init(256)
+            val key: SecretKey = keyGen.generateKey()
+            val storedKey = Base64.getEncoder().encodeToString(key.encoded)
+            print("AES256-key for config property: $storedKey")
+        }
+    }
+
+
 }

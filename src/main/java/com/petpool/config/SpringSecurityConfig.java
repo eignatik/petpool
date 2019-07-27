@@ -3,8 +3,6 @@ package com.petpool.config;
 import com.petpool.config.security.AuthenticationTokenFilter;
 import com.petpool.config.security.AuthenticationTokenProvider;
 import com.petpool.config.security.CustomAccessDeniedHandler;
-import com.petpool.config.security.CustomAuthenticationProvider;
-import com.petpool.config.security.CustomSavedRequestAwareAuthenticationSuccessHandler;
 import com.petpool.config.security.RestAuthenticationEntryPoint;
 import com.petpool.domain.model.user.UserType;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +18,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -85,7 +81,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()//.anyRequest().authenticated()
         .requestMatchers(PUBLIC_API_URL).permitAll()
         .requestMatchers(PRIVATE_API_URL).authenticated()
-        .requestMatchers(ADMIN_API_URL).hasRole(UserType.ADMIN.getValue())
+        .requestMatchers(ADMIN_API_URL).hasRole(UserType.ADMIN.getName())
         .anyRequest().denyAll()
         .and()
         .formLogin().disable()
