@@ -27,7 +27,7 @@ public class JwtCodec {
   private Key jwtKey;
 
   @Autowired
-  public void setJwtKey(Key jwtKey) {
+  public JwtCodec(Key jwtKey) {
     this.jwtKey = jwtKey;
   }
 
@@ -42,13 +42,8 @@ public class JwtCodec {
   /**
    * Token was expired
    */
-  public static class ExpirationTokenException extends Exception {
-
-    public ExpirationTokenException(String message) {
-      super(message);
-    }
-
-    public ExpirationTokenException(String message, Throwable cause) {
+  static class ExpirationTokenException extends Exception {
+    ExpirationTokenException(String message, Throwable cause) {
       super(message, cause);
     }
   }
@@ -56,13 +51,8 @@ public class JwtCodec {
   /**
    * Token has invalid signature( old or fake token)
    */
-  public static class InvalidSignatureTokenException extends Exception {
-
-    public InvalidSignatureTokenException(String message) {
-      super(message);
-    }
-
-    public InvalidSignatureTokenException(String message, Throwable cause) {
+  static class InvalidSignatureTokenException extends Exception {
+    InvalidSignatureTokenException(String message, Throwable cause) {
       super(message, cause);
     }
   }
@@ -70,14 +60,10 @@ public class JwtCodec {
   /**
    * Token has invalid payload
    */
-  public static class InvalidPayloadTokenException extends Exception {
+  static class InvalidPayloadTokenException extends Exception {
 
-    public InvalidPayloadTokenException(String message) {
+    InvalidPayloadTokenException(String message) {
       super(message);
-    }
-
-    public InvalidPayloadTokenException(String message, Throwable cause) {
-      super(message, cause);
     }
   }
 
@@ -86,15 +72,19 @@ public class JwtCodec {
    *
    * @param minutes time period in minutes
    */
-  public static Date createExpirationDate(int minutes) {
+  public static Date createExpirationDateFromNow(int minutes) {
+    return createExpirationDateFromDate(new Date(), minutes);
+  }
+
+  public static Date createExpirationDateFromDate(Date startDate, int minutes) {
     Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(System.currentTimeMillis());
+    calendar.setTime(startDate);
     calendar.add(Calendar.MINUTE, minutes);
     return calendar.getTime();
   }
 
   public String buildToken(User user, int expirationInMinutes, String serviceNameOrUrl) {
-    return buildToken(user, createExpirationDate(expirationInMinutes), serviceNameOrUrl);
+    return buildToken(user, createExpirationDateFromNow(expirationInMinutes), serviceNameOrUrl);
   }
 
   public String buildToken(User user, Date expirationDate, String serviceNameOrUrl) {

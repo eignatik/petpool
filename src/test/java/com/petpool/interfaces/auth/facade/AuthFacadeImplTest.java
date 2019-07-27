@@ -42,7 +42,6 @@ public class AuthFacadeImplTest {
   @BeforeClass
   public void init() {
     MockitoAnnotations.initMocks(this);
-    facade.setPasswordEncoder(encoder);
   }
 
   @AfterMethod

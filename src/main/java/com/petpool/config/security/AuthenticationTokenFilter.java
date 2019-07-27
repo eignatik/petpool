@@ -39,7 +39,6 @@ public class AuthenticationTokenFilter extends AbstractAuthenticationProcessingF
         .ofNullable(httpServletRequest.getHeader("Authorization"))
         .map(String::valueOf)
         .map(t -> StringUtils.removeStart(t, "Bearer").trim())
-        //.map(t-> new String(Base64.getDecoder().decode(t)))
         .map(t -> new UsernamePasswordAuthenticationToken(t, t))
         .orElseThrow(() -> new TokenAuthException("You must send token in Authorization header."));
 

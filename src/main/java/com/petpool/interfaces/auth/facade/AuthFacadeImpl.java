@@ -5,17 +5,13 @@ import com.petpool.config.security.JwtCodec;
 import com.petpool.domain.model.user.Token;
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.service.UserService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import java.security.Key;
 import java.util.Base64;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,33 +33,24 @@ public class AuthFacadeImpl implements AuthFacade {
   private String serviceName;
 
   @Value("${token.expirationInMinutes}")
-  private int expirationToken;
+  private int expirationTokenTime;
 
   @Value("${token.refresh.expirationInMinutes}")
-  private int expirationRefreshToken;
+  private int expirationRefreshTokenTime;
 
   @Autowired
-  public void setJwtKey(Key jwtKey){
-    this.jwtKey = jwtKey;
-  }
-
-  @Autowired
-  public void setPasswordEncoder(
-      PasswordEncoder passwordEncoder) {
+  public AuthFacadeImpl(
+      UserService userService,
+      PasswordEncoder passwordEncoder,
+      Key jwtKey,
+      JwtCodec jwtCodec) {
+    this.userService = userService;
     this.passwordEncoder = passwordEncoder;
-  }
-
-  @Autowired
-  public void setJwtCodec(JwtCodec jwtCodec){
+    this.jwtKey = jwtKey;
     this.jwtCodec = jwtCodec;
   }
 
-  @Autowired
-  public AuthFacadeImpl(UserService userService) {
-    this.userService = userService;
-  }
-
-  private User deleteExpiredTokens(User user){
+  private User deleteExpiredTokens(User user) {
     userService.deleteExpiredTokens(user);
     return user;
   }
@@ -78,7 +65,6 @@ public class AuthFacadeImpl implements AuthFacade {
     } else {
       foundedUser = userService.findByName(credentials.getName());
     }
-
 
     return foundedUser
         .map(this::deleteExpiredTokens)
@@ -97,15 +83,14 @@ public class AuthFacadeImpl implements AuthFacade {
    *
    * if token expired method return Options.empty and user must request new  token!
    *
-   * @param refreshToken  token to be refreshed
-   * @param userAgent     user agent
-   * @return
+   * @param refreshToken token to be refreshed
+   * @param userAgent user agent
    */
   @Override
   public Optional<Map<String, String>> refreshTokenForUser(String refreshToken, String userAgent) {
     return userService
         .findTokenByRefreshToken(refreshToken)
-        .flatMap(token->{
+        .flatMap(token -> {
           if (checkRefreshTokenNotExpired(token)) {
             return Optional.of(token);
           }
@@ -119,13 +104,13 @@ public class AuthFacadeImpl implements AuthFacade {
     return passwordEncoder.matches(password, encodedPassword);
   }
 
-  private boolean checkRefreshTokenNotExpired(Token token){
+  private boolean checkRefreshTokenNotExpired(Token token) {
     return token.getExpired().after(new Date(System.currentTimeMillis()));
   }
 
   private Map<String, String> generateToken(User user, String userAgent, String ip) {
 
-    Date expirationDateRefresh = JwtCodec.createExpirationDate(expirationRefreshToken);
+    Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(expirationRefreshTokenTime);
     Map<String, String> res = buildNewTokens(user);
 
     Token token = new Token(
@@ -146,7 +131,7 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private Map<String, String> updateToken(Token token, String userAgent, String ip) {
 
-    Date expirationDateRefresh = JwtCodec.createExpirationDate(expirationRefreshToken);
+    Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(expirationRefreshTokenTime);
     Map<String, String> res = buildNewTokens(token.getUser());
 
     token.setBrowser(browserFromUserAgent(userAgent));
@@ -162,18 +147,18 @@ public class AuthFacadeImpl implements AuthFacade {
   }
 
 
-
   private Map<String, String> buildNewTokens(User user) {
 
-    Date expirationDate = JwtCodec.createExpirationDate(expirationToken);
-    String accessToken =  jwtCodec.buildToken(user,expirationDate, serviceName);
+    Date expirationDate = JwtCodec.createExpirationDateFromNow(expirationTokenTime);
+    String accessToken = jwtCodec.buildToken(user, expirationDate, serviceName);
 
     String refreshToken = UUID.randomUUID().toString();
 
     Map<String, String> map = new HashMap<>();
 
     map.put(TokenAttributes.ACCESS_TOKEN, accessToken);
-    map.put(TokenAttributes.REFRESH_TOKEN, Base64.getEncoder().encodeToString(refreshToken.getBytes()));
+    map.put(TokenAttributes.REFRESH_TOKEN,
+        Base64.getEncoder().encodeToString(refreshToken.getBytes()));
     map.put(TokenAttributes.EXPIRED, String.valueOf(expirationDate.getTime()));
     return map;
   }

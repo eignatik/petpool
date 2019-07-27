@@ -25,8 +25,7 @@ public class JwtCodecTest {
       throws InvalidPayloadTokenException, InvalidSignatureTokenException, ExpirationTokenException {
     SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    JwtCodec codec = new JwtCodec();
-    codec.setJwtKey(key);
+    JwtCodec codec = new JwtCodec(key);
 
     Set<Role> roles = Set.of(new Role(UserType.ADMIN), new Role(UserType.USER));
     User user = new User("Вася", "qwe", "qwe@qwe.com", new Date(), roles);
@@ -34,24 +33,28 @@ public class JwtCodecTest {
 
     String token = codec.buildToken(user, 60, "service");
 
-    assertNotNull(token);
-
     Payload payload = codec.parseToken(token);
 
     assertEquals(payload.getUserId(), 1);
 
-    assertTrue(payload.getRoles().stream()
-        .filter(r -> r.getName().equals("ADMIN") || r.getName().equals("USER")).count() == 2);
+    assertTrue(hasAdminAndUserInPayloadRoles(payload),"Payload dont contains serialized roles");
+  }
+  private boolean hasAdminAndUserInPayloadRoles(Payload payload){
+    return payload.getRoles().stream()
+        .filter(r -> r.getName().equals("ADMIN") || r.getName().equals("USER")).count() == 2;
   }
 
 
   @Test
   public void testCreateExpirationDate() {
 
-    Date expirationDate = JwtCodec.createExpirationDate(100);
-    long delta = expirationDate.getTime() - System.currentTimeMillis();
-    long expiration = 100 * 60 * 1000;
+    int testedTimeInMinutes=100;
+    long testedTimeInMilliseconds = 100 * 60 * 1000;
+    Date currentTime = new Date();
+    Date expectedDate = new Date(currentTime.getTime()+testedTimeInMilliseconds);
 
-    assertTrue(expiration - delta >= 0 && expiration - delta < 1000 * 2L);
+    Date actualDate = JwtCodec.createExpirationDateFromDate(currentTime, testedTimeInMinutes);
+
+    assertTrue(actualDate.compareTo(expectedDate)==0, "Expected and actual date not equals");
   }
 }

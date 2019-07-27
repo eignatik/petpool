@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserImpl implements UserFacade {
+public class UserFacadeImpl implements UserFacade {
 
   private final UserService userService;
 
   @Autowired
-  public UserImpl(UserService userService) {
+  public UserFacadeImpl(UserService userService) {
     this.userService = userService;
   }
 

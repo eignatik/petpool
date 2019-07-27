@@ -55,7 +55,7 @@ public class AuthenticationTokenProvider extends AbstractUserDetailsAuthenticati
     } catch (ExpirationTokenException e) {
       throw new TokenAuthException("Token id expired", e);
     } catch (Exception e) {
-      throw new TokenAuthException("Other token's parser exception");
+      throw new TokenAuthException("Other token's parser exception",e);
     }
     return new AuthorizedUser(payload.getUserId(), payload.getRoles());
 

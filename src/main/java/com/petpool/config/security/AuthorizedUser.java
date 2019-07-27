@@ -1,9 +1,12 @@
 package com.petpool.config.security;
 
+
 import com.petpool.domain.model.user.UserType;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,13 +14,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class AuthorizedUser implements UserDetails {
 
   private final long userId;
-  private final Set<UserType> roles;
+  private final Set<UserType> userRoles;
   private final Set<SimpleGrantedAuthority> authority = new HashSet<>();
 
-  public AuthorizedUser(long userId, Set<UserType> roles) {
+  public AuthorizedUser(long userId, Set<UserType> userRoles) {
     this.userId = userId;
-    this.roles = roles;
-    for (UserType role : roles) {
+    this.userRoles = userRoles;
+    for (UserType role : userRoles) {
       authority.add(new SimpleGrantedAuthority(role.getName()));
     }
 
@@ -28,23 +31,18 @@ public class AuthorizedUser implements UserDetails {
   }
 
   public Set<UserType> getRoles() {
-    return roles;
+    return userRoles;
   }
 
   public boolean hasRole(UserType role) {
-    return roles.contains(role);
+    return userRoles.contains(role);
   }
 
   public boolean hasAnyRoles(UserType... roles) {
     if (roles.length == 0) {
       return false;
     }
-    for (UserType role : roles) {
-      if (this.roles.contains(role)) {
-        return true;
-      }
-    }
-    return false;
+    return CollectionUtils.containsAny(userRoles, roles);
   }
 
   public boolean hasAllRoles(UserType... roles) {
@@ -52,7 +50,7 @@ public class AuthorizedUser implements UserDetails {
       return false;
     }
     for (UserType role : roles) {
-      if (!this.roles.contains(role)) {
+      if (!userRoles.contains(role)) {
         return false;
       }
     }
@@ -67,7 +65,7 @@ public class AuthorizedUser implements UserDetails {
 
   @Override
   public String getPassword() {
-    return "";
+    return StringUtils.EMPTY;//not needed
   }
 
   @Override
@@ -96,6 +94,6 @@ public class AuthorizedUser implements UserDetails {
   }
 
   private boolean userIsBannedOrDeleted() {
-    return roles.contains(UserType.BANNED) || roles.contains(UserType.DELETED);
+    return CollectionUtils.containsAny(userRoles, UserType.BANNED, UserType.DELETED);
   }
 }
