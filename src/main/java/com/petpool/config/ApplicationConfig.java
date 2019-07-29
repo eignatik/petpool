@@ -117,7 +117,7 @@ public class ApplicationConfig {
     BasicDataSource dataSource = new BasicDataSource();
     dataSource.setDriverClassName(dataBaseProperties.getDriverClass());
     dataSource.setUrl(dataBaseProperties.getUrl());
-    dataSource.setUsername(dataBaseProperties.getName());
+    dataSource.setUsername(dataBaseProperties.getUser());
     dataSource.setPassword(dataBaseProperties.isUseLocalDbProperties() ?
         dataBaseProperties.getPassword() :
         encryptionTool.decrypt(dataBaseProperties.getPassword()));
