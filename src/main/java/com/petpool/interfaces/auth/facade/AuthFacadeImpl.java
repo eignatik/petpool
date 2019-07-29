@@ -2,6 +2,7 @@ package com.petpool.interfaces.auth.facade;
 
 import com.petpool.application.constants.TokenAttributes;
 import com.petpool.config.security.JwtCodec;
+import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.model.user.Token;
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.service.UserService;
@@ -25,29 +26,20 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private PasswordEncoder passwordEncoder;
 
-  private Key jwtKey;
-
   private JwtCodec jwtCodec;
 
-  @Value("${serviceName}")
-  private String serviceName;
+  private final SecurityConf securityConf;
 
-  @Value("${token.expirationInMinutes}")
-  private int expirationTokenTime;
-
-  @Value("${token.refresh.expirationInMinutes}")
-  private int expirationRefreshTokenTime;
 
   @Autowired
   public AuthFacadeImpl(
       UserService userService,
       PasswordEncoder passwordEncoder,
-      Key jwtKey,
-      JwtCodec jwtCodec) {
+      JwtCodec jwtCodec, SecurityConf securityConf) {
     this.userService = userService;
     this.passwordEncoder = passwordEncoder;
-    this.jwtKey = jwtKey;
     this.jwtCodec = jwtCodec;
+    this.securityConf = securityConf;
   }
 
   private User deleteExpiredTokens(User user) {
@@ -110,7 +102,7 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private Map<String, String> generateToken(User user, String userAgent, String ip) {
 
-    Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(expirationRefreshTokenTime);
+    Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(securityConf.getRefreshTokenExpirationInMinutes());
     Map<String, String> res = buildNewTokens(user);
 
     Token token = new Token(
@@ -131,7 +123,7 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private Map<String, String> updateToken(Token token, String userAgent, String ip) {
 
-    Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(expirationRefreshTokenTime);
+    Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(securityConf.getRefreshTokenExpirationInMinutes());
     Map<String, String> res = buildNewTokens(token.getUser());
 
     token.setBrowser(browserFromUserAgent(userAgent));
@@ -149,8 +141,8 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private Map<String, String> buildNewTokens(User user) {
 
-    Date expirationDate = JwtCodec.createExpirationDateFromNow(expirationTokenTime);
-    String accessToken = jwtCodec.buildToken(user, expirationDate, serviceName);
+    Date expirationDate = JwtCodec.createExpirationDateFromNow(securityConf.getAccessTokenExpirationInMinutes());
+    String accessToken = jwtCodec.buildToken(user, expirationDate, securityConf.getTokenProviderName());
 
     String refreshToken = UUID.randomUUID().toString();
 

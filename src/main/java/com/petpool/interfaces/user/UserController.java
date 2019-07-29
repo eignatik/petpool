@@ -1,5 +1,7 @@
 package com.petpool.interfaces.user;
 
+import com.petpool.config.security.AuthContext;
+import com.petpool.config.security.AuthorizedUser;
 import com.petpool.domain.model.user.User;
 import com.petpool.interfaces.user.facade.UserFacade;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/private/user")
 public class UserController {
 
-  private UserFacade userFacade;
+  private final UserFacade userFacade;
+
+  private final AuthContext authContext;
 
   @Autowired
-  public void setUserFacade(UserFacade userFacade) {
+  public  UserController(UserFacade userFacade, AuthContext authContext) {
     this.userFacade = userFacade;
+    this.authContext = authContext;
   }
 
   @GetMapping("name/{id}")
   public @ResponseBody
   ResponseEntity<String> getName(@PathVariable String id) {
+    System.out.println(authContext.getUser().getUserId());
     return userFacade
         .findById(Long.valueOf(id))
         .map(User::getUserName)

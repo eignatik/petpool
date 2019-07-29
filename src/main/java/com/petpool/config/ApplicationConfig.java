@@ -4,6 +4,7 @@ import com.petpool.application.constants.HibernateAttrs;
 import com.petpool.application.util.DataBaseProperties;
 import com.petpool.application.util.EncryptionTool;
 import com.petpool.application.util.LocalDataBaseProperties;
+import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.shared.DataBaseInitializer;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
@@ -40,7 +41,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Slf4j
 @Configuration
-@PropertySource({"environment.properties", "environment-local.properties"})
+@PropertySource({"environment.properties", "environment-local.properties","security.properties"})
 @EnableJpaRepositories(basePackages = {"com.petpool.domain.model"})
 @EnableTransactionManagement
 @Import({SpringSecurityConfig.class})
@@ -52,7 +53,7 @@ public class ApplicationConfig {
   @Value("${encryption.key}")
   private String encKey;
 
-  @Value("${encryption.key.jwt}")
+  @Value("${security.encryptionKeyJwt}")
   private String encKeyJwt;
 
   @Bean
@@ -175,6 +176,13 @@ public class ApplicationConfig {
   @ConfigurationProperties(prefix = "local.db")
   LocalDataBaseProperties localDataBaseProperties() {
     return new LocalDataBaseProperties();
+  }
+
+
+  @Bean
+  @ConfigurationProperties(prefix = "security")
+  SecurityConf securityConfProperties() {
+    return new SecurityConf();
   }
 
 }

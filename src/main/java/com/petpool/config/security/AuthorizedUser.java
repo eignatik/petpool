@@ -17,6 +17,8 @@ public class AuthorizedUser implements UserDetails {
   private final Set<UserType> userRoles;
   private final Set<SimpleGrantedAuthority> authority = new HashSet<>();
 
+  public static final AuthorizedUser GUEST = new AuthorizedUser(0, Set.of(UserType.GUEST));
+
   public AuthorizedUser(long userId, Set<UserType> userRoles) {
     this.userId = userId;
     this.userRoles = userRoles;
@@ -75,25 +77,25 @@ public class AuthorizedUser implements UserDetails {
 
   @Override
   public boolean isAccountNonExpired() {
-    return !userIsBannedOrDeleted();
+    return !userIsBannedOrDeletedOrGuest();
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    return !userIsBannedOrDeleted();
+    return !userIsBannedOrDeletedOrGuest();
   }
 
   @Override
   public boolean isCredentialsNonExpired() {
-    return !userIsBannedOrDeleted();
+    return !userIsBannedOrDeletedOrGuest();
   }
 
   @Override
   public boolean isEnabled() {
-    return !userIsBannedOrDeleted();
+    return !userIsBannedOrDeletedOrGuest();
   }
 
-  private boolean userIsBannedOrDeleted() {
-    return CollectionUtils.containsAny(userRoles, UserType.BANNED, UserType.DELETED);
+  private boolean userIsBannedOrDeletedOrGuest() {
+    return CollectionUtils.containsAny(userRoles, UserType.BANNED, UserType.DELETED, UserType.GUEST);
   }
 }

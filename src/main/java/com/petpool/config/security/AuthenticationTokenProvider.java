@@ -53,7 +53,7 @@ public class AuthenticationTokenProvider extends AbstractUserDetailsAuthenticati
     } catch (InvalidSignatureTokenException e) {
       throw new TokenAuthException("Invalid token's signature", e);
     } catch (ExpirationTokenException e) {
-      throw new TokenAuthException("Token id expired", e);
+      throw new TokenAuthException("Token is expired", e);
     } catch (Exception e) {
       throw new TokenAuthException("Other token's parser exception",e);
     }

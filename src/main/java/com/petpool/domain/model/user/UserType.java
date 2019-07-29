@@ -1,6 +1,5 @@
 package com.petpool.domain.model.user;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -10,7 +9,8 @@ public enum UserType {
   USER("USER"),
   NOT_APPROVED("NOT_APPROVED"),
   BANNED("BANNED"),
-  DELETED("DELETED");
+  DELETED("DELETED"),
+  GUEST("GUEST");
 
   private String name;
 
