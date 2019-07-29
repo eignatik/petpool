@@ -1,4 +1,13 @@
+import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.security.Keys
 import java.net.URI
+import java.util.*
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+import java.nio.charset.StandardCharsets
 
 group = "com.petpool"
 version = "1.0-SNAPSHOT"
@@ -15,6 +24,7 @@ val javaVersion = JavaVersion.VERSION_11
 val encoding = "UTF-8"
 
 object DependencyVersions {
+    const val jwtVersion = "0.10.7"
     const val hibernateVersion = "5.4.3.Final"
     const val jdbcDriverVersion = "8.0.16"
     const val commonLangVersion = "3.8.1"
@@ -39,8 +49,20 @@ plugins {
     id("org.springframework.boot").version("2.1.6.RELEASE")
     `maven-publish`
     id("org.sonarqube").version("2.7")
+    jacoco
 }
 
+
+buildscript{
+    repositories {
+        mavenCentral()
+    }
+    dependencies{
+        classpath ("io.jsonwebtoken","jjwt-api", "0.10.7")
+        classpath ("io.jsonwebtoken","jjwt-impl", "0.10.7")
+        classpath ("io.jsonwebtoken","jjwt-jackson", "0.10.7")
+    }
+}
 
 
 apply(plugin = "io.spring.dependency-management")
@@ -87,6 +109,10 @@ dependencies {
     implementation ("org.springframework","spring-orm",DependencyVersions.ormVersion)
     implementation("org.apache.commons","commons-dbcp2",DependencyVersions.connectionPoolVersion)
 
+    implementation ("io.jsonwebtoken","jjwt-api", DependencyVersions.jwtVersion)
+    implementation ("io.jsonwebtoken","jjwt-impl", DependencyVersions.jwtVersion)
+    implementation ("io.jsonwebtoken","jjwt-jackson", DependencyVersions.jwtVersion)
+
 }
 
 configure<JavaPluginConvention> {
@@ -132,5 +158,92 @@ publishing  {
                 password = System.getenv("AZURE_ARTIFACTS_ENV_ACCESS_TOKEN") ?: azureArtifactsGradleAccessToken
             }
         }
+    }
+
+
+    tasks.register("generate_jwt_key") {
+        doLast {
+            val key = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+            val storedKey = Base64.getEncoder().encodeToString(key.encoded)
+            print("JWT-key for config property: $storedKey")
+        }
+    }
+
+    tasks.register("generate_aes_key") {
+        doLast {
+            val keyGen = KeyGenerator.getInstance("AES")
+            keyGen.init(128)
+            val key: SecretKey = keyGen.generateKey()
+            val storedKey = Base64.getEncoder().encodeToString(key.encoded)
+            print("AES128-key for config property: $storedKey")
+        }
+    }
+
+
+    tasks.register("encrypt_aes_string") {
+        description="Encrypt string by AES with key(AES-key). Sent param to task : gradle encrypt_aes_string -Psrc=mystring -Pkey=123"
+        doLast {
+            if(project.hasProperty("src") || project.hasProperty("key")) {
+                val strKey = project.property("key") as String
+                val decodedKey = Base64.getDecoder().decode(strKey.toByteArray())
+                val key = SecretKeySpec(decodedKey, "AES")
+
+                var encrypted: String
+                val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+                cipher.init(Cipher.ENCRYPT_MODE, key, IvParameterSpec(ByteArray(16)))
+                val src = project.property("src") as String
+                val enc = cipher.doFinal( src.toByteArray())
+                encrypted = Base64.getEncoder().encodeToString(enc)
+
+                print("Encripted string: $encrypted")
+            }
+        }
+    }
+
+
+    jacoco {
+        toolVersion = "0.8.4"
+        reportsDir = file("$buildDir/jacocoReports")
+
+    }
+
+    tasks.jacocoTestReport {
+        reports {
+            xml.isEnabled = true
+            csv.isEnabled = false
+            html.destination = file("${buildDir}/report/html")
+            xml.destination = file("${buildDir}/report/report.xml")
+        }
+    }
+
+    tasks.jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                element = "CLASS"
+                limit {
+                    minimum = "1.0".toBigDecimal()
+                    counter = "LINE"
+                    value = "COVEREDRATIO"
+                }
+                excludes= listOf(
+                        "com.petpool.application.exception.*",
+                        "com.petpool.domain.model.user.*",
+                        "com.petpool.domain.model.user.*",
+                        "com.petpool.domain.shared.DataBaseInitializer",
+                        "com.petpool.application.constants.*",
+                        "com.petpool.application.util.DataBaseProperties",
+                        "com.petpool.application.util.LocalDataBaseProperties",
+                        "com.petpool.application.util.response.ErrorType",
+                        "com.petpool.config.*",
+                        "com.petpool.Application" )
+            }
+
+
+        }
+    }
+
+    tasks.test {
+        useTestNG()
+        maxHeapSize = "1G"
     }
 }

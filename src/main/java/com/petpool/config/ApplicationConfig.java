@@ -4,10 +4,11 @@ import com.petpool.application.constants.HibernateAttrs;
 import com.petpool.application.util.DataBaseProperties;
 import com.petpool.application.util.EncryptionTool;
 import com.petpool.application.util.LocalDataBaseProperties;
-import com.petpool.domain.service.UserService;
+import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.shared.DataBaseInitializer;
-import com.petpool.interfaces.auth.facade.AuthFacade;
-import com.petpool.interfaces.auth.facade.AuthImpl;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.util.Base64;
 import javax.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -17,9 +18,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 
@@ -34,14 +35,16 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Slf4j
 @Configuration
-@PropertySource({"environment.properties", "environment-local.properties"})
+@PropertySource({"environment.properties", "environment-local.properties","security.properties"})
 @EnableJpaRepositories(basePackages = {"com.petpool.domain.model"})
 @EnableTransactionManagement
-@ComponentScan({"com.petpool"})
+@Import({SpringSecurityConfig.class})
 public class ApplicationConfig {
 
   private static final String DOMAIN_PACKAGE_TO_SCAN = "com.petpool.domain";
@@ -49,6 +52,22 @@ public class ApplicationConfig {
 
   @Value("${encryption.key}")
   private String encKey;
+
+  @Value("${security.encryptionKeyJwt}")
+  private String encKeyJwt;
+
+  @Bean
+  public Key jwtKey(){
+    return Keys.hmacShaKeyFor(Base64.getDecoder().decode(encKeyJwt));
+  }
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  @Bean
+  public PasswordEncoder encoder() {
+    return new BCryptPasswordEncoder(4);
+  }
 
   @Autowired
   private DataBaseInitializer dbInitializer;
@@ -98,7 +117,7 @@ public class ApplicationConfig {
     BasicDataSource dataSource = new BasicDataSource();
     dataSource.setDriverClassName(dataBaseProperties.getDriverClass());
     dataSource.setUrl(dataBaseProperties.getUrl());
-    dataSource.setUsername(dataBaseProperties.getName());
+    dataSource.setUsername(dataBaseProperties.getUser());
     dataSource.setPassword(dataBaseProperties.isUseLocalDbProperties() ?
         dataBaseProperties.getPassword() :
         encryptionTool.decrypt(dataBaseProperties.getPassword()));
@@ -157,6 +176,13 @@ public class ApplicationConfig {
   @ConfigurationProperties(prefix = "local.db")
   LocalDataBaseProperties localDataBaseProperties() {
     return new LocalDataBaseProperties();
+  }
+
+
+  @Bean
+  @ConfigurationProperties(prefix = "security")
+  SecurityConf securityConfProperties() {
+    return new SecurityConf();
   }
 
 }

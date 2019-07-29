@@ -1,27 +1,25 @@
-package com.petpool.interfaces.auth.facade;
+package com.petpool.interfaces.user.facade;
 
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.service.UserService;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthImpl implements AuthFacade {
+public class UserFacadeImpl implements UserFacade {
 
   private final UserService userService;
 
   @Autowired
-  public AuthImpl(UserService userService) {
+  public UserFacadeImpl(UserService userService) {
     this.userService = userService;
   }
 
-  @Override
-  public User createNewUser(User user) {
-    return userService.createUser(user);
-  }
+
 
   @Override
-  public User findById(Long id) {
+  public Optional<User> findById(Long id) {
     return userService.findById(id);
   }
 

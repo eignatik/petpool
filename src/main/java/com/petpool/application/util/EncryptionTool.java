@@ -49,7 +49,7 @@ public final class EncryptionTool {
     String encrypted;
     try {
       Cipher cipher = Cipher.getInstance(encryptionAlgorithm);
-      cipher.init(Cipher.ENCRYPT_MODE, generateKey(), new IvParameterSpec(new byte[16]));
+      cipher.init(Cipher.ENCRYPT_MODE, prepareKey(), new IvParameterSpec(new byte[16]));
       byte[] enc = cipher.doFinal(source.getBytes());
       encrypted = Base64.getEncoder().encodeToString(enc);
     } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException |
@@ -69,7 +69,7 @@ public final class EncryptionTool {
     byte[] decrypted;
     try {
       Cipher cipher = Cipher.getInstance(encryptionAlgorithm);
-      cipher.init(Cipher.DECRYPT_MODE, generateKey(), new IvParameterSpec(new byte[16]));
+      cipher.init(Cipher.DECRYPT_MODE, prepareKey(), new IvParameterSpec(new byte[16]));
       byte[] decryptedValue = Base64.getDecoder().decode(source.getBytes());
       decrypted = cipher.doFinal(decryptedValue);
     } catch (InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException |
@@ -79,10 +79,9 @@ public final class EncryptionTool {
     return new String(decrypted);
   }
 
-  private Key generateKey() {
-    String decodedKey = new String(Base64.getDecoder().decode(encryptionKey.getBytes()),
-        StandardCharsets.UTF_8);
-    return new SecretKeySpec(decodedKey.getBytes(), DEFAULT_KEY_ENC_ALGORITHM);
+  private Key prepareKey() {
+    byte[] decodedKey = Base64.getDecoder().decode(encryptionKey.getBytes());
+    return new SecretKeySpec(decodedKey, DEFAULT_KEY_ENC_ALGORITHM);
   }
 
 }

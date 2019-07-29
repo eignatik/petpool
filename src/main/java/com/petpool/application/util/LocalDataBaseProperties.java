@@ -8,6 +8,7 @@ public class LocalDataBaseProperties {
   private String url;
   private String name;
   private String password;
+  private String user;
   private String hibernateHbm2ddlAuto;
 
 }

@@ -12,6 +12,7 @@ public class DataBaseProperties {
   private String url;
   private String name;
   private String password;
+  private String user;
   private String driverClass;
   private int hibernatePoolSize;
   private String hibernateSessionContextClass;
@@ -35,6 +36,7 @@ public class DataBaseProperties {
       name = localDataBaseProperties.getName();
       password = localDataBaseProperties.getPassword();
       hibernateHbm2ddlAuto = localDataBaseProperties.getHibernateHbm2ddlAuto();
+      user =localDataBaseProperties.getUser();
     }
   }
 
