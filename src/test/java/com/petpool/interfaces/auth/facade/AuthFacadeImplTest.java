@@ -1,6 +1,7 @@
 package com.petpool.interfaces.auth.facade;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -8,12 +9,15 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.petpool.config.security.JwtCodec;
+import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.model.user.Role;
 import com.petpool.domain.model.user.Token;
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.model.user.UserType;
 import com.petpool.domain.service.UserService;
 import com.petpool.interfaces.auth.facade.AuthFacade.Credentials;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -34,14 +38,25 @@ public class AuthFacadeImplTest {
   private static final String TEST_EMAIL = "hello@test.test";
   private static final String TEST_PASSWORD = "secretPassword";
   private static final String USER_AGENT = "userAgent";
+  private static final Integer EXPIRATION_STUB_TIME = 10000;
+  private static final String TEST_PROVIDER_NAME = "testProviderName";
 
-  @Mock private UserService userService;
-  @Mock private PasswordEncoder encoder;
-  @InjectMocks private AuthFacadeImpl facade;
+  @Mock
+  private UserService userService;
+  @Mock
+  private PasswordEncoder encoder;
+  @Mock
+  private SecurityConf securityConf;
+  @Mock
+  private JwtCodec jwtCodec;
+  @InjectMocks
+  private AuthFacadeImpl facade;
 
   @BeforeClass
   public void init() {
     MockitoAnnotations.initMocks(this);
+    when(securityConf.getAccessTokenExpirationInMinutes()).thenReturn(EXPIRATION_STUB_TIME);
+    when(securityConf.getTokenProviderName()).thenReturn(TEST_PROVIDER_NAME);
   }
 
   @AfterMethod
@@ -91,12 +106,17 @@ public class AuthFacadeImplTest {
 
   @Test
   public void testRefreshTokenForUser_createsNewToken_whenTokenFound() {
-    final String refreshToken = "refreshToken";
+    final String refreshToken = "RT-iurvbkuybvubv";
+    final String accessToken = "AT-sdkjfsjhdbfiu43u";
     User user = mock(User.class);
     Token tokenFromRepository = new Token();
     tokenFromRepository.setUser(user);
+    tokenFromRepository.setExpired(getStubDateAfterCurrentDate());
     when(userService.findTokenByRefreshToken(eq(refreshToken)))
         .thenReturn(Optional.of(tokenFromRepository));
+    when(jwtCodec.buildToken(any(User.class), any(Date.class), anyString()))
+        .thenReturn(accessToken);
+
     Optional<Map<String, String>> tokens = facade
         .refreshTokenForUser(refreshToken, USER_AGENT);
 
@@ -114,6 +134,16 @@ public class AuthFacadeImplTest {
 
     Assert.assertNull(tokens.orElse(null), "Tokens should NOT be present");
     verify(userService, never()).saveToken(any());
+  }
+
+  /**
+   * Creates a current date shifted on the offset in milliseconds.
+   *
+   * @return Date object
+   */
+  private Date getStubDateAfterCurrentDate() {
+    final int offsetInMillis = 50_000;
+    return new Date(System.currentTimeMillis() + offsetInMillis);
   }
 
 }

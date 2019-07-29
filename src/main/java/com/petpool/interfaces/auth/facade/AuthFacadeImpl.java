@@ -6,7 +6,6 @@ import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.model.user.Token;
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.service.UserService;
-import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +22,9 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private final UserService userService;
 
-  private PasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
 
-  private JwtCodec jwtCodec;
+  private final JwtCodec jwtCodec;
 
   private final SecurityConf securityConf;
 
