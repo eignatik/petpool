@@ -7,5 +7,6 @@ public enum ErrorType {
   TOKEN_EXPIRED,
   BAD_TOKEN,
   OTHER_AUTH_ERROR,
-  BANNED
+  BANNED,
+  ACCESS_DENIED
 }

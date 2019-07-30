@@ -1,6 +1,5 @@
 package com.petpool.interfaces.auth.facade;
 
-import com.petpool.application.constants.TokenAttributes;
 import com.petpool.config.security.JwtCodec;
 import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.model.user.Token;
@@ -8,8 +7,6 @@ import com.petpool.domain.model.user.User;
 import com.petpool.domain.service.UserService;
 import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +43,7 @@ public class AuthFacadeImpl implements AuthFacade {
   }
 
   @Override
-  public Optional<Map<String, String>> requestTokenForUser(Credentials credentials,
+  public Optional<GeneratedToken> requestTokenForUser(Credentials credentials,
       String userAgent) {
     Optional<User> foundedUser;
 
@@ -77,7 +74,7 @@ public class AuthFacadeImpl implements AuthFacade {
    * @param userAgent user agent
    */
   @Override
-  public Optional<Map<String, String>> refreshTokenForUser(String refreshToken, String userAgent) {
+  public Optional<GeneratedToken> refreshTokenForUser(String refreshToken, String userAgent) {
     return userService
         .findTokenByRefreshToken(refreshToken)
         .flatMap(token -> {
@@ -98,13 +95,13 @@ public class AuthFacadeImpl implements AuthFacade {
     return token.getExpired().after(new Date(System.currentTimeMillis()));
   }
 
-  private Map<String, String> generateToken(User user, String userAgent, String ip) {
+  private GeneratedToken generateToken(User user, String userAgent, String ip) {
 
     Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(securityConf.getRefreshTokenExpirationInMinutes());
-    Map<String, String> res = buildNewTokens(user);
+    GeneratedToken res = buildNewTokens(user);
 
     Token token = new Token(
-        res.get(TokenAttributes.REFRESH_TOKEN),
+        res.getRefreshToken(),
         expirationDateRefresh,
         new Date(System.currentTimeMillis()),
         ip,
@@ -119,17 +116,17 @@ public class AuthFacadeImpl implements AuthFacade {
     return res;
   }
 
-  private Map<String, String> updateToken(Token token, String userAgent, String ip) {
+  private GeneratedToken updateToken(Token token, String userAgent, String ip) {
 
     Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(securityConf.getRefreshTokenExpirationInMinutes());
-    Map<String, String> res = buildNewTokens(token.getUser());
+    GeneratedToken res = buildNewTokens(token.getUser());
 
     token.setBrowser(browserFromUserAgent(userAgent));
     token.setIp(ip);
     token.setUserAgent(userAgent);
     token.setOs(osFromUserAgent(userAgent));
     token.setExpired(expirationDateRefresh);
-    token.setToken(res.get(TokenAttributes.REFRESH_TOKEN));
+    token.setToken(res.getRefreshToken());
 
     userService.saveToken(token);
 
@@ -137,20 +134,20 @@ public class AuthFacadeImpl implements AuthFacade {
   }
 
 
-  private Map<String, String> buildNewTokens(User user) {
+  private GeneratedToken buildNewTokens(User user) {
 
     Date expirationDate = JwtCodec.createExpirationDateFromNow(securityConf.getAccessTokenExpirationInMinutes());
     String accessToken = jwtCodec.buildToken(user, expirationDate, securityConf.getTokenProviderName());
 
     String refreshToken = UUID.randomUUID().toString();
 
-    Map<String, String> map = new HashMap<>();
+    GeneratedToken newToken = new GeneratedToken(
+        accessToken,
+        Base64.getEncoder().encodeToString(refreshToken.getBytes()),
+        expirationDate.getTime()
+    );
 
-    map.put(TokenAttributes.ACCESS_TOKEN, accessToken);
-    map.put(TokenAttributes.REFRESH_TOKEN,
-        Base64.getEncoder().encodeToString(refreshToken.getBytes()));
-    map.put(TokenAttributes.EXPIRED, String.valueOf(expirationDate.getTime()));
-    return map;
+    return newToken;
   }
 
   private String osFromUserAgent(String userAgent) {

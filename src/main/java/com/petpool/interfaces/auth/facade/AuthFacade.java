@@ -21,9 +21,9 @@ public interface AuthFacade {
    * @see Credentials
    * @param credentials data object with user credentials
    * @param userAgent   user agent
-   * @return map        with generated tokens.
+   * @return         with generated tokens.
    */
-  Optional<Map<String, String>> requestTokenForUser(Credentials credentials, String userAgent);
+  Optional<GeneratedToken> requestTokenForUser(Credentials credentials, String userAgent);
 
   /**
    * Creates new token instead of a given refresh token if it's valid and trusted.
@@ -32,9 +32,9 @@ public interface AuthFacade {
    *
    * @param refreshToken  token to be refreshed
    * @param userAgent     user agent
-   * @return              map with new refreshed token
+   * @return               new refreshed token
    */
-  Optional<Map<String, String>> refreshTokenForUser(String refreshToken, String userAgent);
+  Optional<GeneratedToken> refreshTokenForUser(String refreshToken, String userAgent);
 
   @Data
   @AllArgsConstructor

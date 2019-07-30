@@ -76,7 +76,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .accessDeniedHandler(accessDeniedHandler)
         .authenticationEntryPoint(restAuthenticationEntryPoint)
         .and()
-        .authenticationProvider(authProvider)
+        //.authenticationProvider(authProvider)
         .addFilterBefore(authenticationFilter(), AnonymousAuthenticationFilter.class)
         .authorizeRequests()//.anyRequest().authenticated()
         .requestMatchers(PUBLIC_API_URL).permitAll()
