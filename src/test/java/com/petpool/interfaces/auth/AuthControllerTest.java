@@ -6,10 +6,10 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableMap;
+import com.petpool.application.util.response.Response;
 import com.petpool.interfaces.auth.facade.AuthFacade;
 import com.petpool.interfaces.auth.facade.AuthFacade.Credentials;
-import java.util.Map;
+import com.petpool.interfaces.auth.facade.GeneratedToken;
 import java.util.Optional;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -55,12 +55,12 @@ public class AuthControllerTest {
 
   @Test(dataProvider = "validCredentials")
   public void testGetToken_returnsTokens_whenCredentialsValid(Credentials credentials) {
-    final Map<String, String> tokens = ImmutableMap.of("token", "testToken");
+    final GeneratedToken tokens = new GeneratedToken("accesstoken","refreshtoken", System.currentTimeMillis());
     when(facade.requestTokenForUser(eq(credentials), eq(USER_AGENT)))
         .thenReturn(Optional.of(tokens));
-    ResponseEntity<Map<String, String>> response = controller.getToken(credentials, USER_AGENT);
+    ResponseEntity<Response> response = controller.getToken(credentials, USER_AGENT);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK, "Status code should be OK");
-    Assert.assertEquals(response.getBody(), tokens, "Correct tokens map should be returned");
+    Assert.assertEquals(response.getBody().getPayload(), tokens, "Correct tokens map should be returned");
   }
 
   @DataProvider(name = "invalidCredentials")
@@ -75,11 +75,13 @@ public class AuthControllerTest {
 
   @Test(dataProvider = "invalidCredentials")
   public void testGetToken_returnsError_whenCredentialsValid(Credentials credentials) {
-    ResponseEntity<Map<String, String>> response = controller.getToken(credentials, USER_AGENT);
+    ResponseEntity<Response> response = controller.getToken(credentials, USER_AGENT);
     Assert.assertEquals(
         response.getStatusCode(),
-        HttpStatus.UNAUTHORIZED,
-        "Status code should be 401");
+        HttpStatus.OK,
+        "Status code should be 200");
+
+    Assert.assertTrue(response.getBody().isErrorPresent(), "isErrorPresent should be true");
     verify(facade, never()).requestTokenForUser(Mockito.any(Credentials.class), eq(USER_AGENT));
   }
 

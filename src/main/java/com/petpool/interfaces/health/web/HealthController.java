@@ -1,11 +1,11 @@
 package com.petpool.interfaces.health.web;
 
 import com.google.common.collect.ImmutableMap;
+import com.petpool.application.util.response.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -17,10 +17,8 @@ public class HealthController {
    * @return Map with running parameters.
    */
   @GetMapping("/health")
-  public Map<String, Object> checkRunning() {
-    return ImmutableMap.of(
-        "applicationStatus", "UP"
-    );
+  public ResponseEntity<Response> checkRunning() {
+    return Response.ok(ImmutableMap.of("applicationStatus", "UP"));
   }
 }
 

@@ -83,7 +83,7 @@ public class AuthFacadeImplTest {
     when(userService.findByName(eq(credentials.getName()))).thenReturn(Optional.of(user));
     when(encoder.matches(eq(TEST_PASSWORD), eq(TEST_PASSWORD))).thenReturn(true);
 
-    Optional<Map<String, String>> tokens = facade
+    Optional<GeneratedToken> tokens = facade
         .requestTokenForUser(credentials, USER_AGENT);
 
     Assert.assertNotNull(tokens.orElse(null), "Tokens should be present");
@@ -97,7 +97,7 @@ public class AuthFacadeImplTest {
 
     when(encoder.matches(eq(TEST_PASSWORD), eq(TEST_PASSWORD))).thenReturn(true);
 
-    Optional<Map<String, String>> tokens = facade
+    Optional<GeneratedToken> tokens = facade
         .requestTokenForUser(credentials, USER_AGENT);
 
     Assert.assertNull(tokens.orElse(null), "Tokens should NOT be present");
@@ -117,7 +117,7 @@ public class AuthFacadeImplTest {
     when(jwtCodec.buildToken(any(User.class), any(Date.class), anyString()))
         .thenReturn(accessToken);
 
-    Optional<Map<String, String>> tokens = facade
+    Optional<GeneratedToken> tokens = facade
         .refreshTokenForUser(refreshToken, USER_AGENT);
 
     Assert.assertNotNull(tokens.orElse(null), "Tokens should be present");
@@ -129,7 +129,7 @@ public class AuthFacadeImplTest {
     final String refreshToken = "refreshToken";
     when(userService.findTokenByRefreshToken(eq(refreshToken)))
         .thenReturn(Optional.empty());
-    Optional<Map<String, String>> tokens = facade
+    Optional<GeneratedToken> tokens = facade
         .refreshTokenForUser(refreshToken, USER_AGENT);
 
     Assert.assertNull(tokens.orElse(null), "Tokens should NOT be present");

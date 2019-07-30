@@ -1,6 +1,7 @@
 package com.petpool.config.security;
 
 import com.petpool.application.exception.TokenAuthException;
+import com.petpool.application.util.response.ErrorType;
 import com.petpool.config.security.JwtCodec.ExpirationTokenException;
 import com.petpool.config.security.JwtCodec.InvalidPayloadTokenException;
 import com.petpool.config.security.JwtCodec.InvalidSignatureTokenException;
@@ -49,13 +50,13 @@ public class AuthenticationTokenProvider extends AbstractUserDetailsAuthenticati
     try {
       payload = jwtCodec.parseToken(tokenStr);
     } catch (InvalidPayloadTokenException e) {
-      throw new TokenAuthException("Invalid token's payload", e);
+      throw new TokenAuthException("Invalid token's payload", ErrorType.BAD_TOKEN, e);
     } catch (InvalidSignatureTokenException e) {
-      throw new TokenAuthException("Invalid token's signature", e);
+      throw new TokenAuthException("Invalid token's signature", ErrorType.BAD_TOKEN, e);
     } catch (ExpirationTokenException e) {
-      throw new TokenAuthException("Token is expired", e);
+      throw new TokenAuthException("Token is expired", ErrorType.TOKEN_EXPIRED ,e);
     } catch (Exception e) {
-      throw new TokenAuthException("Other token's parser exception",e);
+      throw new TokenAuthException("Other token's parser exception", ErrorType.OTHER_AUTH_ERROR, e);
     }
     return new AuthorizedUser(payload.getUserId(), payload.getRoles());
 

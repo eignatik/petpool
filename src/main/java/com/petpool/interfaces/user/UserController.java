@@ -1,7 +1,8 @@
 package com.petpool.interfaces.user;
 
+import com.petpool.application.util.response.ErrorType;
+import com.petpool.application.util.response.Response;
 import com.petpool.config.security.AuthContext;
-import com.petpool.config.security.AuthorizedUser;
 import com.petpool.domain.model.user.User;
 import com.petpool.interfaces.user.facade.UserFacade;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,12 @@ public class UserController {
 
   @GetMapping("name/{id}")
   public @ResponseBody
-  ResponseEntity<String> getName(@PathVariable String id) {
-    System.out.println(authContext.getUser().getUserId());
+  ResponseEntity<Response> getName(@PathVariable String id) {
+
     return userFacade
         .findById(Long.valueOf(id))
         .map(User::getUserName)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.status(400).body("User with id ="+id+" not found."));
+        .map(Response::ok)
+        .orElse(Response.error(ErrorType.BAD_REQUEST, "User with id ="+id+" not found."));
   }
 }

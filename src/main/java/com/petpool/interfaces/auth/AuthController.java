@@ -1,11 +1,11 @@
 package com.petpool.interfaces.auth;
 
+import com.petpool.application.util.response.ErrorType;
+import com.petpool.application.util.response.Response;
 import com.petpool.interfaces.auth.facade.AuthFacade;
 import com.petpool.interfaces.auth.facade.AuthFacade.Credentials;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,24 +29,24 @@ public class AuthController {
 
   @PostMapping("request")
   public @ResponseBody
-  ResponseEntity<Map<String, String>> getToken(@RequestBody Credentials credentials,
+  ResponseEntity<Response> getToken(@RequestBody Credentials credentials,
       @RequestHeader("User-Agent") String userAgent) {
 
     return Optional.of(credentials)
         .filter(Credentials::isValid)
         .flatMap(cr -> authFacade.requestTokenForUser(cr, userAgent))
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        .map(Response::ok)
+        .orElse(Response.error(ErrorType.ACCESS_DENIED,"Invalid credentials"));
   }
 
   @PostMapping("refresh")
   public @ResponseBody
-  ResponseEntity<Map<String, String>> refreshToken(
+  ResponseEntity<Response> refreshToken(
       @RequestParam("refresh") final String refreshToken,
       @RequestHeader("User-Agent") String userAgent) {
     return authFacade
         .refreshTokenForUser(refreshToken, userAgent)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.status(405).build());
+        .map(Response::ok)
+        .orElse(Response.error(ErrorType.BAD_REQUEST,"Refresh token incorrect"));
   }
 }
