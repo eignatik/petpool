@@ -13,7 +13,7 @@ public class Response implements Serializable {
   public Response(Object payload, Error error) {
     this.payload = payload;
     this.error = error;
-    if (error!=null) errorPresent = true;
+    errorPresent = error != null;
   }
 
 
