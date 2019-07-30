@@ -6,12 +6,10 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableMap;
 import com.petpool.application.util.response.Response;
 import com.petpool.interfaces.auth.facade.AuthFacade;
 import com.petpool.interfaces.auth.facade.AuthFacade.Credentials;
 import com.petpool.interfaces.auth.facade.GeneratedToken;
-import java.util.Map;
 import java.util.Optional;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -57,7 +55,7 @@ public class AuthControllerTest {
 
   @Test(dataProvider = "validCredentials")
   public void testGetToken_returnsTokens_whenCredentialsValid(Credentials credentials) {
-    final GeneratedToken tokens = new GeneratedToken("1","2",1);
+    final GeneratedToken tokens = new GeneratedToken("accesstoken","refreshtoken", System.currentTimeMillis());
     when(facade.requestTokenForUser(eq(credentials), eq(USER_AGENT)))
         .thenReturn(Optional.of(tokens));
     ResponseEntity<Response> response = controller.getToken(credentials, USER_AGENT);
@@ -83,7 +81,7 @@ public class AuthControllerTest {
         HttpStatus.OK,
         "Status code should be 200");
 
-    Assert.assertTrue(response.getBody().hasError(), "isError should be true");
+    Assert.assertTrue(response.getBody().isErrorPresent(), "isErrorPresent should be true");
     verify(facade, never()).requestTokenForUser(Mockito.any(Credentials.class), eq(USER_AGENT));
   }
 

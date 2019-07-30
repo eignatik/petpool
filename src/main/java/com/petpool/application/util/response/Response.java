@@ -1,5 +1,6 @@
 package com.petpool.application.util.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import org.springframework.http.ResponseEntity;
 
@@ -7,12 +8,12 @@ public class Response implements Serializable {
 
   private Object payload;
   private Error error;
-  private boolean hasError;
+  private boolean errorPresent;
 
   public Response(Object payload, Error error) {
     this.payload = payload;
     this.error = error;
-    if (error!=null) hasError = true;
+    if (error!=null) errorPresent = true;
   }
 
 
@@ -25,8 +26,9 @@ public class Response implements Serializable {
     return error;
   }
 
-  public boolean isHasError() {
-    return hasError;
+  @JsonProperty("hasError")
+  public boolean isErrorPresent() {
+    return errorPresent;
   }
 
 

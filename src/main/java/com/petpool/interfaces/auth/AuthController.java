@@ -47,6 +47,6 @@ public class AuthController {
     return authFacade
         .refreshTokenForUser(refreshToken, userAgent)
         .map(Response::ok)
-        .orElse(Response.error(ErrorType.BAD_REQUEST,""));
+        .orElse(Response.error(ErrorType.BAD_REQUEST,"Refresh token incorrect"));
   }
 }

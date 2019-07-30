@@ -76,7 +76,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .accessDeniedHandler(accessDeniedHandler)
         .authenticationEntryPoint(restAuthenticationEntryPoint)
         .and()
-        //.authenticationProvider(authProvider)
         .addFilterBefore(authenticationFilter(), AnonymousAuthenticationFilter.class)
         .authorizeRequests()//.anyRequest().authenticated()
         .requestMatchers(PUBLIC_API_URL).permitAll()
@@ -93,7 +92,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
   private AuthenticationTokenFilter authenticationFilter() throws Exception {
     final AuthenticationTokenFilter filter = new AuthenticationTokenFilter(PROTECTED_URLS);
     filter.setAuthenticationManager(authenticationManager());
-    //filter.setAuthenticationSuccessHandler(successHandler());
+
     return filter;
   }
 
