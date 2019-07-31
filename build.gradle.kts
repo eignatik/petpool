@@ -1,5 +1,6 @@
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import org.springframework.boot.gradle.tasks.run.BootRun
 import java.net.URI
 import java.util.*
 import javax.crypto.Cipher
@@ -8,6 +9,7 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import java.nio.charset.StandardCharsets
+import kotlin.collections.HashMap
 
 group = "com.petpool"
 version = "1.0-SNAPSHOT"
@@ -66,6 +68,22 @@ buildscript{
 
 
 apply(plugin = "io.spring.dependency-management")
+
+tasks {
+    "bootRun"(BootRun::class) {
+        main = "com.petpool.Application"
+        val properties = System.getProperties()
+        val arguments = HashMap<String, Any>()
+        for (name in properties.stringPropertyNames()) {
+            arguments[name] = properties.getProperty(name)
+        }
+        systemProperties = arguments
+//        if (project.hasProperty("keys")) {
+//            val property = project.property("keys") as String
+//            args(property.split("\\s"))
+//        }
+    }
+}
 
 repositories {
     mavenCentral()
