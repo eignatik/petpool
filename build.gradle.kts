@@ -1,5 +1,6 @@
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import org.springframework.boot.gradle.tasks.run.BootRun
 import java.net.URI
 import java.util.*
 import javax.crypto.Cipher
@@ -8,11 +9,12 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import java.nio.charset.StandardCharsets
+import kotlin.collections.HashMap
 
 group = "com.petpool"
 version = "1.0-SNAPSHOT"
 
-data class AppVersion(val major: Int, val minor: Int, val iter: Int){
+data class AppVersion(val major: Int, val minor: Int, val iter: Int) {
     override fun toString(): String {
         return "$major.$minor.$iter"
     }
@@ -46,26 +48,28 @@ object DependencyVersions {
 plugins {
     java
     id("application")
+    id("io.spring.dependency-management") version "1.0.8.RELEASE"
     id("org.springframework.boot").version("2.1.6.RELEASE")
     `maven-publish`
     id("org.sonarqube").version("2.7")
     jacoco
+
 }
 
 
-buildscript{
+
+buildscript {
     repositories {
         mavenCentral()
     }
-    dependencies{
-        classpath ("io.jsonwebtoken","jjwt-api", "0.10.7")
-        classpath ("io.jsonwebtoken","jjwt-impl", "0.10.7")
-        classpath ("io.jsonwebtoken","jjwt-jackson", "0.10.7")
+    dependencies {
+        classpath("io.jsonwebtoken", "jjwt-api", "0.10.7")
+        classpath("io.jsonwebtoken", "jjwt-impl", "0.10.7")
+        classpath("io.jsonwebtoken", "jjwt-jackson", "0.10.7")
     }
 }
 
 
-apply(plugin = "io.spring.dependency-management")
 
 repositories {
     mavenCentral()
@@ -80,38 +84,38 @@ configurations {
 
 dependencies {
     testCompile("org.testng", "testng", DependencyVersions.testNGVersion)
-    testCompile ("org.mockito","mockito-core", DependencyVersions.mockitoVersion)
-    testCompile ("org.springframework.boot:spring-boot-starter-test")
+    testCompile("org.mockito", "mockito-core", DependencyVersions.mockitoVersion)
+    testCompile("org.springframework.boot:spring-boot-starter-test")
 
-    compileOnly("org.projectlombok","lombok", DependencyVersions.lombokVersion)
-    annotationProcessor("org.projectlombok","lombok", DependencyVersions.lombokVersion)
+    compileOnly("org.projectlombok", "lombok", DependencyVersions.lombokVersion)
+    annotationProcessor("org.projectlombok", "lombok", DependencyVersions.lombokVersion)
 
     implementation("ch.qos.logback", "logback-classic", DependencyVersions.logbackVersion)
     implementation("ch.qos.logback", "logback-core", DependencyVersions.logbackVersion)
     implementation("org.slf4j", "slf4j-api", DependencyVersions.slf4jVersion)
-    implementation("javax.annotation","javax.annotation-api", DependencyVersions.javaxAnnotationVersion)
+    implementation("javax.annotation", "javax.annotation-api", DependencyVersions.javaxAnnotationVersion)
     implementation("io.projectreactor", "reactor-core", DependencyVersions.projectReactorVersion)
 
-    implementation ("org.hibernate","hibernate-core",DependencyVersions.hibernateVersion)
-    implementation ("org.hibernate","hibernate-entitymanager",DependencyVersions.hibernateVersion)
+    implementation("org.hibernate", "hibernate-core", DependencyVersions.hibernateVersion)
+    implementation("org.hibernate", "hibernate-entitymanager", DependencyVersions.hibernateVersion)
 
-    implementation ("mysql","mysql-connector-java",DependencyVersions.jdbcDriverVersion)
-    implementation ("org.apache.commons","commons-lang3",DependencyVersions.commonLangVersion)
-    implementation ("org.apache.commons","commons-collections4",DependencyVersions.collectionUtilsVersion)
-    implementation ("com.google.guava","guava",DependencyVersions.guavaVersion)
-    implementation ("com.fasterxml.jackson.core","jackson-databind",DependencyVersions.jacksonVersion)
+    implementation("mysql", "mysql-connector-java", DependencyVersions.jdbcDriverVersion)
+    implementation("org.apache.commons", "commons-lang3", DependencyVersions.commonLangVersion)
+    implementation("org.apache.commons", "commons-collections4", DependencyVersions.collectionUtilsVersion)
+    implementation("com.google.guava", "guava", DependencyVersions.guavaVersion)
+    implementation("com.fasterxml.jackson.core", "jackson-databind", DependencyVersions.jacksonVersion)
 
-    implementation ("org.springframework.boot:spring-boot-starter-web")
-    implementation ("org.springframework.boot:spring-boot-starter-tomcat")
-    implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation ("org.springframework.boot:spring-boot-starter-security")
-    
-    implementation ("org.springframework","spring-orm",DependencyVersions.ormVersion)
-    implementation("org.apache.commons","commons-dbcp2",DependencyVersions.connectionPoolVersion)
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-tomcat")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-security")
 
-    implementation ("io.jsonwebtoken","jjwt-api", DependencyVersions.jwtVersion)
-    implementation ("io.jsonwebtoken","jjwt-impl", DependencyVersions.jwtVersion)
-    implementation ("io.jsonwebtoken","jjwt-jackson", DependencyVersions.jwtVersion)
+    implementation("org.springframework", "spring-orm", DependencyVersions.ormVersion)
+    implementation("org.apache.commons", "commons-dbcp2", DependencyVersions.connectionPoolVersion)
+
+    implementation("io.jsonwebtoken", "jjwt-api", DependencyVersions.jwtVersion)
+    implementation("io.jsonwebtoken", "jjwt-impl", DependencyVersions.jwtVersion)
+    implementation("io.jsonwebtoken", "jjwt-jackson", DependencyVersions.jwtVersion)
 
 }
 
@@ -121,12 +125,22 @@ configure<JavaPluginConvention> {
 
 }
 
+
+
 application {
-    mainClassName="com.petpool.Application"
+    mainClassName = "com.petpool.Application"
+}
+
+tasks.withType(JavaExec::class) {
+    if (System.getProperty("encryption.key") != null && System.getProperty("security.encryptionKeyJwt") != null) {
+        systemProperties["encryption.key"] = System.getProperty("encryption.key")
+        systemProperties["security.encryptionKeyJwt"] = System.getProperty("security.encryptionKeyJwt")
+    }
+
 }
 
 
-tasks.jar{
+tasks.jar {
     manifest {
         attributes(
                 "Main-Class" to mainClass,
@@ -135,13 +149,13 @@ tasks.jar{
         )
     }
 }
-tasks.compileJava{
-    this.options.encoding ="UTF-8"
+tasks.compileJava {
+    this.options.encoding = "UTF-8"
 }
 
 val azureArtifactsGradleAccessToken: String by project
 
-publishing  {
+publishing {
     publications {
         create<MavenPublication>("PetPool") {
             from(components["java"])
@@ -150,12 +164,13 @@ publishing  {
         }
     }
 
-        repositories{
+    repositories {
         maven {
             url = URI("https://pkgs.dev.azure.com/perfo-foundation/_packaging/petpool/maven/v1")
             credentials {
                 username = "AZURE_ARTIFACTS"
-                password = System.getenv("AZURE_ARTIFACTS_ENV_ACCESS_TOKEN") ?: azureArtifactsGradleAccessToken
+                password = System.getenv("AZURE_ARTIFACTS_ENV_ACCESS_TOKEN")
+                        ?: azureArtifactsGradleAccessToken
             }
         }
     }
@@ -181,9 +196,9 @@ publishing  {
 
 
     tasks.register("encrypt_aes_string") {
-        description="Encrypt string by AES with key(AES-key). Sent param to task : gradle encrypt_aes_string -Psrc=mystring -Pkey=123"
+        description = "Encrypt string by AES with key(AES-key). Sent param to task : gradle encrypt_aes_string -Psrc=mystring -Pkey=123"
         doLast {
-            if(project.hasProperty("src") || project.hasProperty("key")) {
+            if (project.hasProperty("src") || project.hasProperty("key")) {
                 val strKey = project.property("key") as String
                 val decodedKey = Base64.getDecoder().decode(strKey.toByteArray())
                 val key = SecretKeySpec(decodedKey, "AES")
@@ -192,7 +207,7 @@ publishing  {
                 val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
                 cipher.init(Cipher.ENCRYPT_MODE, key, IvParameterSpec(ByteArray(16)))
                 val src = project.property("src") as String
-                val enc = cipher.doFinal( src.toByteArray())
+                val enc = cipher.doFinal(src.toByteArray())
                 encrypted = Base64.getEncoder().encodeToString(enc)
 
                 print("Encripted string: $encrypted")
@@ -225,7 +240,7 @@ publishing  {
                     counter = "LINE"
                     value = "COVEREDRATIO"
                 }
-                excludes= listOf(
+                excludes = listOf(
                         "com.petpool.application.exception.*",
                         "com.petpool.domain.model.user.*",
                         "com.petpool.domain.model.user.*",
@@ -235,7 +250,7 @@ publishing  {
                         "com.petpool.application.util.LocalDataBaseProperties",
                         "com.petpool.application.util.response.ErrorType",
                         "com.petpool.config.*",
-                        "com.petpool.Application" )
+                        "com.petpool.Application")
             }
 
 
