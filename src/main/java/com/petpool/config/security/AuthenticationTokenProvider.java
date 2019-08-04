@@ -1,64 +1,39 @@
 package com.petpool.config.security;
 
-import com.petpool.application.exception.TokenAuthException;
-import com.petpool.application.util.response.ErrorType;
-import com.petpool.config.security.JwtCodec.ExpirationTokenException;
-import com.petpool.config.security.JwtCodec.InvalidPayloadTokenException;
-import com.petpool.config.security.JwtCodec.InvalidSignatureTokenException;
-import com.petpool.config.security.JwtCodec.Payload;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 /**
- * Uses token for get user from database and token's verification.
+ *  This AuthenticationProvider used by spring security pipeline with AuthorizedUserAuthentication class.
  */
 @Component
-public class AuthenticationTokenProvider extends AbstractUserDetailsAuthenticationProvider {
+public class AuthenticationTokenProvider implements AuthenticationProvider {
 
-
-  private JwtCodec jwtCodec;
-
-  @Autowired
-  public void setJwtCodec(JwtCodec jwtCodec) {
-    this.jwtCodec = jwtCodec;
-  }
 
   @Override
-  protected void additionalAuthenticationChecks(UserDetails userDetails,
-      UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken)
-      throws AuthenticationException {
-    //not required
+  public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
+
+    if (authentication instanceof AuthorizedUserAuthentication) {
+
+      return authentication;
+    } else {
+      throw new BadCredentialsException("Ошибочные данные аутентификации");
+    }
   }
 
   /**
-   * <p>The function retrieveUser return correct authorized user in specific format UserDetails</p>
+   * Check if authentication provider can use this authentication data container(AuthorizedUserAuthentication).
    *
-   * @see UserDetails
+   * AuthorizedUserAuthentication  provided by AuthenticationTokenFilter
+   * @see AuthenticationTokenFilter
+   * @param authentication  authentication data container
+   * @return true if we use correct authentication data container for this  authentication provider
    */
   @Override
-  protected UserDetails retrieveUser(String userName,
-      UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken)
-      throws AuthenticationException {
-
-    String tokenStr = String.valueOf(usernamePasswordAuthenticationToken.getCredentials());
-
-    Payload payload;
-    try {
-      payload = jwtCodec.parseToken(tokenStr);
-    } catch (InvalidPayloadTokenException e) {
-      throw new TokenAuthException("Invalid token's payload", ErrorType.BAD_TOKEN, e);
-    } catch (InvalidSignatureTokenException e) {
-      throw new TokenAuthException("Invalid token's signature", ErrorType.BAD_TOKEN, e);
-    } catch (ExpirationTokenException e) {
-      throw new TokenAuthException("Token is expired", ErrorType.TOKEN_EXPIRED ,e);
-    } catch (Exception e) {
-      throw new TokenAuthException("Other token's parser exception", ErrorType.OTHER_AUTH_ERROR, e);
-    }
-    return new AuthorizedUser(payload.getUserId(), payload.getRoles());
-
+  public boolean supports(final Class<?> authentication) {
+    return authentication.equals(AuthorizedUserAuthentication.class);
   }
 }
