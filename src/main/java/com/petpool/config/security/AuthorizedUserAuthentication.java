@@ -46,16 +46,16 @@ public class AuthorizedUserAuthentication implements Authentication {
 
   @Override
   public Object getPrincipal() {
-    return user.getUserId();
+    return user;
   }
 
   @Override
   public boolean isAuthenticated() {
-    return userIsBannedOrDeletedOrGuest();
+    return !userIsBannedOrDeletedOrGuest();
   }
 
   @Override
-  public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+  public void setAuthenticated(boolean isAuthenticated) {
     throw new RuntimeException("Operation not used");
   }
 

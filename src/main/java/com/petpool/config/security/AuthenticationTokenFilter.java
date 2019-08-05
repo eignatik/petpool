@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -44,8 +43,7 @@ public class AuthenticationTokenFilter extends AbstractAuthenticationProcessingF
 
   @Override
   public Authentication attemptAuthentication(HttpServletRequest httpServletRequest,
-      HttpServletResponse httpServletResponse)
-      throws AuthenticationException, IOException, ServletException {
+      HttpServletResponse httpServletResponse) {
     //Authorization: Bearer TOKEN
     String token = Optional
         .ofNullable(httpServletRequest.getHeader("Authorization"))
@@ -64,8 +62,7 @@ public class AuthenticationTokenFilter extends AbstractAuthenticationProcessingF
 
   }
 
-  private Authentication parseToken(String token, HttpServletRequest httpServletRequest)
-      throws TokenAuthException {
+  private Authentication parseToken(String token, HttpServletRequest httpServletRequest) {
     Payload payload;
     ErrorType errorType = null;
     String msg = "";

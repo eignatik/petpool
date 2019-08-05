@@ -30,7 +30,7 @@ public class UserController {
   @GetMapping("name/{id}")
   public @ResponseBody
   ResponseEntity<Response> getName(@PathVariable String id) {
-
+    System.out.println(authContext.getUser().getUserId());
     return userFacade
         .findById(Long.valueOf(id))
         .map(User::getUserName)
