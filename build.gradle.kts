@@ -1,7 +1,5 @@
-import com.sun.org.apache.xml.internal.security.algorithms.SignatureAlgorithm
-import io.jsonwebtoken.SignatureAlgorithm
+
 import io.jsonwebtoken.security.Keys
-import org.springframework.boot.gradle.tasks.run.BootRun
 import java.net.URI
 import java.util.*
 import javax.crypto.Cipher
@@ -9,8 +7,6 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
-import java.nio.charset.StandardCharsets
-import kotlin.collections.HashMap
 
 group = "com.petpool"
 version = "1.0-SNAPSHOT"
@@ -179,7 +175,7 @@ publishing {
 
     tasks.register("generate_jwt_key") {
         doLast {
-            val key = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+            val key = Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256)
             val storedKey = Base64.getEncoder().encodeToString(key.encoded)
             print("JWT-key for config property: $storedKey")
         }
