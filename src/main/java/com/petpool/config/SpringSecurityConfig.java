@@ -3,6 +3,7 @@ package com.petpool.config;
 import com.petpool.config.security.AuthenticationTokenFilter;
 import com.petpool.config.security.AuthenticationTokenProvider;
 import com.petpool.config.security.CustomAccessDeniedHandler;
+import com.petpool.config.security.JwtCodec;
 import com.petpool.config.security.RestAuthenticationEntryPoint;
 import com.petpool.domain.model.user.UserType;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,17 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @PropertySource({"environment.properties"})
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
+  private static final RequestMatcher PUBLIC_API_URL = new AntPathRequestMatcher("/api/public/**");
+  private static final RequestMatcher PRIVATE_API_URL = new AntPathRequestMatcher(
+      "/api/private/**");
+  private static final RequestMatcher ADMIN_API_URL = new AntPathRequestMatcher(
+      "/api/admin/**");
+
+  private static final RequestMatcher PROTECTED_URLS = new OrRequestMatcher(
+      PRIVATE_API_URL,
+      ADMIN_API_URL
+  );
+
   @Value("${encryption.key}")
   private String encKey;
 
@@ -40,7 +52,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-
 
   private SimpleUrlAuthenticationFailureHandler myFailureHandler = new SimpleUrlAuthenticationFailureHandler();
 
@@ -52,20 +63,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     webSecurity.ignoring().antMatchers("/token/**", "/health");
   }
 
+  @Autowired
+  private JwtCodec jwtCodec;
+
+
   @Override
   protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
     auth.authenticationProvider(authProvider);
-
   }
-
-  private static final RequestMatcher PUBLIC_API_URL =  new AntPathRequestMatcher("/api/public/**");
-  private static final RequestMatcher PRIVATE_API_URL =  new AntPathRequestMatcher("/api/private/**");
-  private static final RequestMatcher ADMIN_API_URL =  new AntPathRequestMatcher("/api/administrative/**");
-
-  private static final RequestMatcher PROTECTED_URLS = new OrRequestMatcher(
-      PRIVATE_API_URL,
-      ADMIN_API_URL
-  );
 
   @Override
   protected void configure(final HttpSecurity http) throws Exception {
@@ -76,7 +81,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         .accessDeniedHandler(accessDeniedHandler)
         .authenticationEntryPoint(restAuthenticationEntryPoint)
         .and()
-        .addFilterBefore(authenticationFilter(), AnonymousAuthenticationFilter.class)
+        .addFilterBefore(authenticationFilter(jwtCodec), AnonymousAuthenticationFilter.class)
         .authorizeRequests()//.anyRequest().authenticated()
         .requestMatchers(PUBLIC_API_URL).permitAll()
         .requestMatchers(PRIVATE_API_URL).authenticated()
@@ -89,10 +94,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
 
-  private AuthenticationTokenFilter authenticationFilter() throws Exception {
-    final AuthenticationTokenFilter filter = new AuthenticationTokenFilter(PROTECTED_URLS);
+  AuthenticationTokenFilter authenticationFilter(JwtCodec jwtCodec) throws Exception {
+    final AuthenticationTokenFilter filter = new AuthenticationTokenFilter(PROTECTED_URLS,
+        jwtCodec);
     filter.setAuthenticationManager(authenticationManager());
-
     return filter;
   }
 
@@ -100,7 +105,5 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
   AuthenticationEntryPoint forbiddenEntryPoint() {
     return new HttpStatusEntryPoint(HttpStatus.FORBIDDEN);
   }
-
-
 
 }
