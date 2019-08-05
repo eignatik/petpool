@@ -1,3 +1,4 @@
+import com.sun.org.apache.xml.internal.security.algorithms.SignatureAlgorithm
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import org.springframework.boot.gradle.tasks.run.BootRun

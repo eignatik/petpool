@@ -37,7 +37,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
   private static final RequestMatcher PRIVATE_API_URL = new AntPathRequestMatcher(
       "/api/private/**");
   private static final RequestMatcher ADMIN_API_URL = new AntPathRequestMatcher(
-      "/api/administrative/**");
+      "/api/admin/**");
 
   private static final RequestMatcher PROTECTED_URLS = new OrRequestMatcher(
       PRIVATE_API_URL,
