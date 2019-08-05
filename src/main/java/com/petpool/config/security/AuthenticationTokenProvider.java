@@ -20,7 +20,7 @@ public class AuthenticationTokenProvider implements AuthenticationProvider {
 
       return authentication;
     } else {
-      throw new BadCredentialsException("Ошибочные данные аутентификации");
+      throw new BadCredentialsException("Bad credentials");
     }
   }
 
@@ -34,6 +34,6 @@ public class AuthenticationTokenProvider implements AuthenticationProvider {
    */
   @Override
   public boolean supports(final Class<?> authentication) {
-    return authentication.equals(AuthorizedUserAuthentication.class);
+    return AuthorizedUserAuthentication.class.equals(authentication);
   }
 }

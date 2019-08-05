@@ -37,7 +37,7 @@ public final class RestAuthenticationEntryPoint implements AuthenticationEntryPo
       errorType = (ErrorType) errorTypeAttribute;
     }
 
-    if (errorTypeAttribute != null) {
+    if (msgAttribute != null) {
       msg = (String) msgAttribute;
     }
 
