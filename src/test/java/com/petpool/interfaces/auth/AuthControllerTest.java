@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.testng.Assert;
@@ -30,6 +31,8 @@ public class AuthControllerTest {
   private static final String TEST_PASSWORD = "secretPassword";
   private static final String EMPTY = "";
   private static final String USER_AGENT = "testUserAgent";
+  private static final HttpHeaders headers = new HttpHeaders();
+
 
   @Mock private AuthFacade facade;
   @InjectMocks private AuthController controller;
@@ -37,6 +40,7 @@ public class AuthControllerTest {
   @BeforeClass
   public void init() {
     MockitoAnnotations.initMocks(this);
+    headers.set("User-Agent",USER_AGENT);
   }
 
   @AfterMethod
@@ -56,9 +60,9 @@ public class AuthControllerTest {
   @Test(dataProvider = "validCredentials")
   public void testGetToken_returnsTokens_whenCredentialsValid(Credentials credentials) {
     final GeneratedToken tokens = new GeneratedToken("accesstoken","refreshtoken", System.currentTimeMillis());
-    when(facade.requestTokenForUser(eq(credentials), eq(USER_AGENT)))
+    when(facade.requestTokenForUser(eq(credentials), eq(headers)))
         .thenReturn(Optional.of(tokens));
-    ResponseEntity<Response> response = controller.getToken(credentials, USER_AGENT);
+    ResponseEntity<Response> response = controller.getToken(credentials, headers);
     Assert.assertEquals(response.getStatusCode(), HttpStatus.OK, "Status code should be OK");
     Assert.assertEquals(response.getBody().getPayload(), tokens, "Correct tokens map should be returned");
   }
@@ -75,14 +79,14 @@ public class AuthControllerTest {
 
   @Test(dataProvider = "invalidCredentials")
   public void testGetToken_returnsError_whenCredentialsValid(Credentials credentials) {
-    ResponseEntity<Response> response = controller.getToken(credentials, USER_AGENT);
+    ResponseEntity<Response> response = controller.getToken(credentials, headers);
     Assert.assertEquals(
         response.getStatusCode(),
         HttpStatus.OK,
         "Status code should be 200");
 
     Assert.assertTrue(response.getBody().isErrorPresent(), "isErrorPresent should be true");
-    verify(facade, never()).requestTokenForUser(Mockito.any(Credentials.class), eq(USER_AGENT));
+    verify(facade, never()).requestTokenForUser(Mockito.any(Credentials.class), eq(headers));
   }
 
 }

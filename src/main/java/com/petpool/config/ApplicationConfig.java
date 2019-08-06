@@ -4,6 +4,7 @@ import com.petpool.application.constants.HibernateAttrs;
 import com.petpool.application.util.DataBaseProperties;
 import com.petpool.application.util.EncryptionTool;
 import com.petpool.application.util.LocalDataBaseProperties;
+import com.petpool.application.util.ip.IPParser;
 import com.petpool.application.util.useragent.UserAgentParser;
 import com.petpool.application.util.useragent.UserAgentParserStrategyStub;
 import com.petpool.config.security.SecurityConf;
@@ -30,6 +31,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.HttpHeaders;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -61,6 +63,11 @@ public class ApplicationConfig {
 
   @Autowired
   private PasswordEncoder passwordEncoder;
+
+  @Bean
+  public IPParser ipParser(){
+    return (HttpHeaders httpHeaders) -> "";
+  }
 
   @Bean
   public UserAgentParser userAgentParser(){

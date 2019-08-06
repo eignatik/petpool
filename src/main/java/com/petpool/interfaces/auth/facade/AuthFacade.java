@@ -1,9 +1,9 @@
 package com.petpool.interfaces.auth.facade;
 
-import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.http.HttpHeaders;
 
 /**
  * Represents the business logic of the auth flow.
@@ -20,10 +20,10 @@ public interface AuthFacade {
    *
    * @see Credentials
    * @param credentials data object with user credentials
-   * @param userAgent   user agent
+   * @param headers   http headers
    * @return         with generated tokens.
    */
-  Optional<GeneratedToken> requestTokenForUser(Credentials credentials, String userAgent);
+  Optional<GeneratedToken> requestTokenForUser(Credentials credentials, HttpHeaders headers);
 
   /**
    * Creates new token instead of a given refresh token if it's valid and trusted.
@@ -31,10 +31,10 @@ public interface AuthFacade {
    * <p>It needed in case if there is a need to refresh a token as it's expired.</p>
    *
    * @param refreshToken  token to be refreshed
-   * @param userAgent     user agent
+   * @param headers     user agent
    * @return               new refreshed token
    */
-  Optional<GeneratedToken> refreshTokenForUser(String refreshToken, String userAgent);
+  Optional<GeneratedToken> refreshTokenForUser(String refreshToken, HttpHeaders headers);
 
   @Data
   @AllArgsConstructor
