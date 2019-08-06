@@ -1,15 +1,16 @@
 package com.petpool.application.util.useragent;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-@Data
-@AllArgsConstructor
 public class OS {
 
   private String name;
   private String version;
+
+  public OS(String name, String version) {
+    this.name = name.isEmpty()?"unknown":name;
+    this.version = version.isEmpty()?"unknown":version;
+  }
 
   @Override
   public String toString() {

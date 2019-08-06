@@ -5,13 +5,15 @@ import com.petpool.application.util.DataBaseProperties;
 import com.petpool.application.util.EncryptionTool;
 import com.petpool.application.util.LocalDataBaseProperties;
 import com.petpool.application.util.useragent.UserAgentParser;
-import com.petpool.application.util.useragent.UserAgentParserStub;
+import com.petpool.application.util.useragent.UserAgentParserStrategyStub;
 import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.shared.DataBaseInitializer;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Base64;
+import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.hibernate.jpa.HibernatePersistenceProvider;
@@ -25,13 +27,9 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
-
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
-import javax.sql.DataSource;
-import java.util.Properties;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -66,7 +64,7 @@ public class ApplicationConfig {
 
   @Bean
   public UserAgentParser userAgentParser(){
-    return new UserAgentParserStub();
+    return new UserAgentParser(new UserAgentParserStrategyStub());
   }
 
   @Bean

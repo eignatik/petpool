@@ -87,6 +87,8 @@ public class AuthFacadeImplTest {
     when(userService.findByEmail(eq(credentials.getEmail()))).thenReturn(Optional.of(user));
     when(userService.findByName(eq(credentials.getName()))).thenReturn(Optional.of(user));
     when(encoder.matches(eq(TEST_PASSWORD), eq(TEST_PASSWORD))).thenReturn(true);
+    when(userAgentParser.parse(anyString()))
+        .thenReturn(getStubUserAgentParserResult());
 
     Optional<GeneratedToken> tokens = facade
         .requestTokenForUser(credentials, USER_AGENT);
@@ -99,6 +101,8 @@ public class AuthFacadeImplTest {
       Credentials credentials) {
     when(userService.findByEmail(any())).thenReturn(Optional.empty());
     when(userService.findByName(any())).thenReturn(Optional.empty());
+    when(userAgentParser.parse(anyString()))
+        .thenReturn(getStubUserAgentParserResult());
 
     when(encoder.matches(eq(TEST_PASSWORD), eq(TEST_PASSWORD))).thenReturn(true);
 

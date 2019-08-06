@@ -1,16 +1,20 @@
 package com.petpool.application.util.useragent;
 
-/**
- * User-agent string parser
- */
-public interface UserAgentParser {
+public class UserAgentParser {
 
-  /**
-   * Parse user-agent header's field string
-   *
-   * @param userAgent string represents user-agent header's field
-   * @return result of parsing
-   */
-  UserAgentParserResult parse(String userAgent);
+  private UserAgentParserStrategy strategy;
+  private static final UserAgentParserResult DEFAULT_RESULT = new UserAgentParserResult(
+      new OS("unknown", "unknown"), new Browser("unknown", "unknown"));
 
+  public UserAgentParser(UserAgentParserStrategy strategy) {
+    this.strategy = strategy;
+  }
+
+  public UserAgentParserResult parse(String userAgent) {
+    UserAgentParserResult result = strategy.parse(userAgent);
+    if (result == null) {
+      return DEFAULT_RESULT;
+    }
+    return result;
+  }
 }

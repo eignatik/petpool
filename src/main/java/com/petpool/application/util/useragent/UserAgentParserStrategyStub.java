@@ -1,6 +1,6 @@
 package com.petpool.application.util.useragent;
 
-public class UserAgentParserStub implements UserAgentParser {
+public class UserAgentParserStrategyStub implements UserAgentParserStrategy {
 
   @Override
   public UserAgentParserResult parse(String userAgent) {
