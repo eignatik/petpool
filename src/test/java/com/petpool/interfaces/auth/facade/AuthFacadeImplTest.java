@@ -9,6 +9,10 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.petpool.application.util.useragent.Browser;
+import com.petpool.application.util.useragent.OS;
+import com.petpool.application.util.useragent.UserAgentParser;
+import com.petpool.application.util.useragent.UserAgentParserResult;
 import com.petpool.config.security.JwtCodec;
 import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.model.user.Role;
@@ -18,7 +22,6 @@ import com.petpool.domain.model.user.UserType;
 import com.petpool.domain.service.UserService;
 import com.petpool.interfaces.auth.facade.AuthFacade.Credentials;
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +44,8 @@ public class AuthFacadeImplTest {
   private static final Integer EXPIRATION_STUB_TIME = 10000;
   private static final String TEST_PROVIDER_NAME = "testProviderName";
 
+  @Mock
+  private UserAgentParser userAgentParser;
   @Mock
   private UserService userService;
   @Mock
@@ -82,6 +87,8 @@ public class AuthFacadeImplTest {
     when(userService.findByEmail(eq(credentials.getEmail()))).thenReturn(Optional.of(user));
     when(userService.findByName(eq(credentials.getName()))).thenReturn(Optional.of(user));
     when(encoder.matches(eq(TEST_PASSWORD), eq(TEST_PASSWORD))).thenReturn(true);
+    when(userAgentParser.parse(anyString()))
+        .thenReturn(getStubUserAgentParserResult());
 
     Optional<GeneratedToken> tokens = facade
         .requestTokenForUser(credentials, USER_AGENT);
@@ -94,6 +101,8 @@ public class AuthFacadeImplTest {
       Credentials credentials) {
     when(userService.findByEmail(any())).thenReturn(Optional.empty());
     when(userService.findByName(any())).thenReturn(Optional.empty());
+    when(userAgentParser.parse(anyString()))
+        .thenReturn(getStubUserAgentParserResult());
 
     when(encoder.matches(eq(TEST_PASSWORD), eq(TEST_PASSWORD))).thenReturn(true);
 
@@ -109,13 +118,21 @@ public class AuthFacadeImplTest {
     final String refreshToken = "RT-iurvbkuybvubv";
     final String accessToken = "AT-sdkjfsjhdbfiu43u";
     User user = mock(User.class);
+
     Token tokenFromRepository = new Token();
     tokenFromRepository.setUser(user);
     tokenFromRepository.setExpired(getStubDateAfterCurrentDate());
+
+    UserAgentParserResult stubUserAgentParserResult = getStubUserAgentParserResult();
+    tokenFromRepository.setOs(stubUserAgentParserResult.getOs().toString());
+    tokenFromRepository.setBrowser(stubUserAgentParserResult.getBrowser().toString());
+
     when(userService.findTokenByRefreshToken(eq(refreshToken)))
         .thenReturn(Optional.of(tokenFromRepository));
     when(jwtCodec.buildToken(any(User.class), any(Date.class), anyString()))
         .thenReturn(accessToken);
+    when(userAgentParser.parse(anyString()))
+        .thenReturn(getStubUserAgentParserResult());
 
     Optional<GeneratedToken> tokens = facade
         .refreshTokenForUser(refreshToken, USER_AGENT);
@@ -144,6 +161,10 @@ public class AuthFacadeImplTest {
   private Date getStubDateAfterCurrentDate() {
     final int offsetInMillis = 50_000;
     return new Date(System.currentTimeMillis() + offsetInMillis);
+  }
+
+  private UserAgentParserResult getStubUserAgentParserResult() {
+    return new UserAgentParserResult(new OS("win", "10"), new Browser("firefox", "10"));
   }
 
 }

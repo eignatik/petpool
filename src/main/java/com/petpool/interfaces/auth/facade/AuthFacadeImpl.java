@@ -1,5 +1,7 @@
 package com.petpool.interfaces.auth.facade;
 
+import com.petpool.application.util.useragent.UserAgentParser;
+import com.petpool.application.util.useragent.UserAgentParserResult;
 import com.petpool.config.security.JwtCodec;
 import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.model.user.Token;
@@ -25,16 +27,20 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private final SecurityConf securityConf;
 
+  private final UserAgentParser userAgentParser;
+
 
   @Autowired
   public AuthFacadeImpl(
       UserService userService,
       PasswordEncoder passwordEncoder,
-      JwtCodec jwtCodec, SecurityConf securityConf) {
+      JwtCodec jwtCodec, SecurityConf securityConf,
+      UserAgentParser userAgentParser) {
     this.userService = userService;
     this.passwordEncoder = passwordEncoder;
     this.jwtCodec = jwtCodec;
     this.securityConf = securityConf;
+    this.userAgentParser = userAgentParser;
   }
 
   private User deleteExpiredTokens(User user) {
@@ -100,14 +106,16 @@ public class AuthFacadeImpl implements AuthFacade {
     Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(securityConf.getRefreshTokenExpirationInMinutes());
     GeneratedToken res = buildNewTokens(user);
 
+    UserAgentParserResult userAgentParserResult = userAgentParser.parse(userAgent);
+
     Token token = new Token(
         res.getRefreshToken(),
         expirationDateRefresh,
         new Date(System.currentTimeMillis()),
         ip,
         userAgent,
-        osFromUserAgent(userAgent),
-        browserFromUserAgent(userAgent),
+        userAgentParserResult.getOs().toString(),
+        userAgentParserResult.getBrowser().toString(),
         user
     );
 
@@ -121,10 +129,12 @@ public class AuthFacadeImpl implements AuthFacade {
     Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(securityConf.getRefreshTokenExpirationInMinutes());
     GeneratedToken res = buildNewTokens(token.getUser());
 
-    token.setBrowser(browserFromUserAgent(userAgent));
+    UserAgentParserResult userAgentParserResult = userAgentParser.parse(userAgent);
+
+    token.setBrowser(userAgentParserResult.getBrowser().toString());
     token.setIp(ip);
     token.setUserAgent(userAgent);
-    token.setOs(osFromUserAgent(userAgent));
+    token.setOs(userAgentParserResult.getOs().toString());
     token.setExpired(expirationDateRefresh);
     token.setToken(res.getRefreshToken());
 
@@ -149,14 +159,5 @@ public class AuthFacadeImpl implements AuthFacade {
 
     return newToken;
   }
-
-  private String osFromUserAgent(String userAgent) {
-    return "windows";
-  }
-
-  private String browserFromUserAgent(String userAgent) {
-    return "firefox";
-  }
-
 
 }
