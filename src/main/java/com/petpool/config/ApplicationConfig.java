@@ -4,6 +4,8 @@ import com.petpool.application.constants.HibernateAttrs;
 import com.petpool.application.util.DataBaseProperties;
 import com.petpool.application.util.EncryptionTool;
 import com.petpool.application.util.LocalDataBaseProperties;
+import com.petpool.application.util.useragent.UserAgentParser;
+import com.petpool.application.util.useragent.UserAgentParserStub;
 import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.shared.DataBaseInitializer;
 import io.jsonwebtoken.security.Keys;
@@ -56,21 +58,26 @@ public class ApplicationConfig {
   @Value("${security.encryptionKeyJwt}")
   private String encKeyJwt;
 
-  @Bean
-  public Key jwtKey(){
-    return Keys.hmacShaKeyFor(Base64.getDecoder().decode(encKeyJwt));
-  }
+  @Autowired
+  private DataBaseInitializer dbInitializer;
 
   @Autowired
   private PasswordEncoder passwordEncoder;
 
   @Bean
+  public UserAgentParser userAgentParser(){
+    return new UserAgentParserStub();
+  }
+
+  @Bean
+  public Key jwtKey(){
+    return Keys.hmacShaKeyFor(Base64.getDecoder().decode(encKeyJwt));
+  }
+
+  @Bean
   public PasswordEncoder encoder() {
     return new BCryptPasswordEncoder(4);
   }
-
-  @Autowired
-  private DataBaseInitializer dbInitializer;
 
   @EventListener(ApplicationReadyEvent.class)
   public void doSomethingAfterStartup() {
