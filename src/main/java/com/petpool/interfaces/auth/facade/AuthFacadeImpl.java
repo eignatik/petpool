@@ -1,5 +1,6 @@
 package com.petpool.interfaces.auth.facade;
 
+import com.petpool.application.util.ip.IpParser;
 import com.petpool.application.util.useragent.UserAgentParser;
 import com.petpool.application.util.useragent.UserAgentParserResult;
 import com.petpool.config.security.JwtCodec;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -29,18 +31,21 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private final UserAgentParser userAgentParser;
 
+  private final IpParser ipParser;
+
 
   @Autowired
   public AuthFacadeImpl(
       UserService userService,
       PasswordEncoder passwordEncoder,
       JwtCodec jwtCodec, SecurityConf securityConf,
-      UserAgentParser userAgentParser) {
+      UserAgentParser userAgentParser, IpParser ipParser) {
     this.userService = userService;
     this.passwordEncoder = passwordEncoder;
     this.jwtCodec = jwtCodec;
     this.securityConf = securityConf;
     this.userAgentParser = userAgentParser;
+    this.ipParser = ipParser;
   }
 
   private User deleteExpiredTokens(User user) {
@@ -50,7 +55,7 @@ public class AuthFacadeImpl implements AuthFacade {
 
   @Override
   public Optional<GeneratedToken> requestTokenForUser(Credentials credentials,
-      String userAgent) {
+      HttpHeaders headers) {
     Optional<User> foundedUser;
 
     if (!StringUtils.isEmpty(credentials.getEmail())) {
@@ -58,6 +63,8 @@ public class AuthFacadeImpl implements AuthFacade {
     } else {
       foundedUser = userService.findByName(credentials.getName());
     }
+    String userAgent = Optional.ofNullable(headers.get("User-Agent"))
+        .map(l -> l.get(0)).orElse("");
 
     return foundedUser
         .map(this::deleteExpiredTokens)
@@ -68,7 +75,7 @@ public class AuthFacadeImpl implements AuthFacade {
             return null;
           }
         })
-        .map(user -> generateToken(user, userAgent, "1.1.1.1"));
+        .map(user -> generateToken(user, userAgent, ipParser.parse(headers)));
   }
 
   /**
@@ -77,10 +84,12 @@ public class AuthFacadeImpl implements AuthFacade {
    * if token expired method return Options.empty and user must request new  token!
    *
    * @param refreshToken token to be refreshed
-   * @param userAgent user agent
+   * @param headers http headers
    */
   @Override
-  public Optional<GeneratedToken> refreshTokenForUser(String refreshToken, String userAgent) {
+  public Optional<GeneratedToken> refreshTokenForUser(String refreshToken, HttpHeaders headers) {
+    String userAgent = Optional.ofNullable(headers.get("User-Agent"))
+        .map(l -> l.get(0)).orElse("");
     return userService
         .findTokenByRefreshToken(refreshToken)
         .flatMap(token -> {
@@ -90,7 +99,7 @@ public class AuthFacadeImpl implements AuthFacade {
           userService.removeToken(token);
           return Optional.empty();
         })
-        .map(token -> updateToken(token, userAgent, "1.1.1.1"));
+        .map(token -> updateToken(token, userAgent, ipParser.parse(headers)));
   }
 
   private boolean checkPassword(String password, String encodedPassword) {
@@ -103,7 +112,8 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private GeneratedToken generateToken(User user, String userAgent, String ip) {
 
-    Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(securityConf.getRefreshTokenExpirationInMinutes());
+    Date expirationDateRefresh = JwtCodec
+        .createExpirationDateFromNow(securityConf.getRefreshTokenExpirationInMinutes());
     GeneratedToken res = buildNewTokens(user);
 
     UserAgentParserResult userAgentParserResult = userAgentParser.parse(userAgent);
@@ -126,7 +136,8 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private GeneratedToken updateToken(Token token, String userAgent, String ip) {
 
-    Date expirationDateRefresh = JwtCodec.createExpirationDateFromNow(securityConf.getRefreshTokenExpirationInMinutes());
+    Date expirationDateRefresh = JwtCodec
+        .createExpirationDateFromNow(securityConf.getRefreshTokenExpirationInMinutes());
     GeneratedToken res = buildNewTokens(token.getUser());
 
     UserAgentParserResult userAgentParserResult = userAgentParser.parse(userAgent);
@@ -146,8 +157,10 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private GeneratedToken buildNewTokens(User user) {
 
-    Date expirationDate = JwtCodec.createExpirationDateFromNow(securityConf.getAccessTokenExpirationInMinutes());
-    String accessToken = jwtCodec.buildToken(user, expirationDate, securityConf.getTokenProviderName());
+    Date expirationDate = JwtCodec
+        .createExpirationDateFromNow(securityConf.getAccessTokenExpirationInMinutes());
+    String accessToken = jwtCodec
+        .buildToken(user, expirationDate, securityConf.getTokenProviderName());
 
     String refreshToken = UUID.randomUUID().toString();
 

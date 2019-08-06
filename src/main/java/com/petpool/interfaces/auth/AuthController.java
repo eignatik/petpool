@@ -6,6 +6,7 @@ import com.petpool.interfaces.auth.facade.AuthFacade;
 import com.petpool.interfaces.auth.facade.AuthFacade.Credentials;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,11 +31,11 @@ public class AuthController {
   @PostMapping("request")
   public @ResponseBody
   ResponseEntity<Response> getToken(@RequestBody Credentials credentials,
-      @RequestHeader("User-Agent") String userAgent) {
+       @RequestHeader HttpHeaders headers) {
 
     return Optional.of(credentials)
         .filter(Credentials::isValid)
-        .flatMap(cr -> authFacade.requestTokenForUser(cr, userAgent))
+        .flatMap(cr -> authFacade.requestTokenForUser(cr, headers))
         .map(Response::ok)
         .orElse(Response.error(ErrorType.ACCESS_DENIED,"Invalid credentials"));
   }
@@ -43,9 +44,10 @@ public class AuthController {
   public @ResponseBody
   ResponseEntity<Response> refreshToken(
       @RequestParam("refresh") final String refreshToken,
-      @RequestHeader("User-Agent") String userAgent) {
+      @RequestHeader HttpHeaders headers) {
+
     return authFacade
-        .refreshTokenForUser(refreshToken, userAgent)
+        .refreshTokenForUser(refreshToken, headers)
         .map(Response::ok)
         .orElse(Response.error(ErrorType.BAD_REQUEST,"Refresh token incorrect"));
   }

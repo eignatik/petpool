@@ -9,6 +9,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.petpool.application.util.ip.IpParser;
 import com.petpool.application.util.useragent.Browser;
 import com.petpool.application.util.useragent.OS;
 import com.petpool.application.util.useragent.UserAgentParser;
@@ -28,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -44,6 +46,8 @@ public class AuthFacadeImplTest {
   private static final Integer EXPIRATION_STUB_TIME = 10000;
   private static final String TEST_PROVIDER_NAME = "testProviderName";
 
+  private static final HttpHeaders headers = new HttpHeaders();
+
   @Mock
   private UserAgentParser userAgentParser;
   @Mock
@@ -54,6 +58,9 @@ public class AuthFacadeImplTest {
   private SecurityConf securityConf;
   @Mock
   private JwtCodec jwtCodec;
+  @Mock
+  IpParser ipParser;
+
   @InjectMocks
   private AuthFacadeImpl facade;
 
@@ -62,6 +69,7 @@ public class AuthFacadeImplTest {
     MockitoAnnotations.initMocks(this);
     when(securityConf.getAccessTokenExpirationInMinutes()).thenReturn(EXPIRATION_STUB_TIME);
     when(securityConf.getTokenProviderName()).thenReturn(TEST_PROVIDER_NAME);
+    headers.set("User-Agent", USER_AGENT);
   }
 
   @AfterMethod
@@ -89,9 +97,11 @@ public class AuthFacadeImplTest {
     when(encoder.matches(eq(TEST_PASSWORD), eq(TEST_PASSWORD))).thenReturn(true);
     when(userAgentParser.parse(anyString()))
         .thenReturn(getStubUserAgentParserResult());
+    when(ipParser.parse(any(HttpHeaders.class)))
+        .thenReturn(USER_AGENT);
 
     Optional<GeneratedToken> tokens = facade
-        .requestTokenForUser(credentials, USER_AGENT);
+        .requestTokenForUser(credentials, headers);
 
     Assert.assertNotNull(tokens.orElse(null), "Tokens should be present");
   }
@@ -107,7 +117,7 @@ public class AuthFacadeImplTest {
     when(encoder.matches(eq(TEST_PASSWORD), eq(TEST_PASSWORD))).thenReturn(true);
 
     Optional<GeneratedToken> tokens = facade
-        .requestTokenForUser(credentials, USER_AGENT);
+        .requestTokenForUser(credentials, headers);
 
     Assert.assertNull(tokens.orElse(null), "Tokens should NOT be present");
     verify(encoder, never()).matches(eq(TEST_PASSWORD), eq(TEST_PASSWORD));
@@ -133,9 +143,12 @@ public class AuthFacadeImplTest {
         .thenReturn(accessToken);
     when(userAgentParser.parse(anyString()))
         .thenReturn(getStubUserAgentParserResult());
+    when(ipParser.parse(any(HttpHeaders.class)))
+        .thenReturn(USER_AGENT);
+
 
     Optional<GeneratedToken> tokens = facade
-        .refreshTokenForUser(refreshToken, USER_AGENT);
+        .refreshTokenForUser(refreshToken, headers);
 
     Assert.assertNotNull(tokens.orElse(null), "Tokens should be present");
     verify(userService).saveToken(eq(tokenFromRepository));
@@ -147,7 +160,7 @@ public class AuthFacadeImplTest {
     when(userService.findTokenByRefreshToken(eq(refreshToken)))
         .thenReturn(Optional.empty());
     Optional<GeneratedToken> tokens = facade
-        .refreshTokenForUser(refreshToken, USER_AGENT);
+        .refreshTokenForUser(refreshToken, headers);
 
     Assert.assertNull(tokens.orElse(null), "Tokens should NOT be present");
     verify(userService, never()).saveToken(any());
