@@ -4,7 +4,7 @@ import com.petpool.application.constants.HibernateAttrs;
 import com.petpool.application.util.DataBaseProperties;
 import com.petpool.application.util.EncryptionTool;
 import com.petpool.application.util.LocalDataBaseProperties;
-import com.petpool.application.util.ip.IPParser;
+import com.petpool.application.util.ip.IpParser;
 import com.petpool.application.util.useragent.UserAgentParser;
 import com.petpool.application.util.useragent.UserAgentParserStrategyStub;
 import com.petpool.config.security.SecurityConf;
@@ -65,7 +65,7 @@ public class ApplicationConfig {
   private PasswordEncoder passwordEncoder;
 
   @Bean
-  public IPParser ipParser(){
+  public IpParser ipParser(){
     return (HttpHeaders httpHeaders) -> "";
   }
 

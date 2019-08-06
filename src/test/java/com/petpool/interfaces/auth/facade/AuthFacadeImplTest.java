@@ -9,7 +9,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.petpool.application.util.ip.IPParser;
+import com.petpool.application.util.ip.IpParser;
 import com.petpool.application.util.useragent.Browser;
 import com.petpool.application.util.useragent.OS;
 import com.petpool.application.util.useragent.UserAgentParser;
@@ -59,7 +59,7 @@ public class AuthFacadeImplTest {
   @Mock
   private JwtCodec jwtCodec;
   @Mock
-  IPParser ipParser;
+  IpParser ipParser;
 
   @InjectMocks
   private AuthFacadeImpl facade;

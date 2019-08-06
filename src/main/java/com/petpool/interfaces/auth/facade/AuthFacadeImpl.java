@@ -1,6 +1,6 @@
 package com.petpool.interfaces.auth.facade;
 
-import com.petpool.application.util.ip.IPParser;
+import com.petpool.application.util.ip.IpParser;
 import com.petpool.application.util.useragent.UserAgentParser;
 import com.petpool.application.util.useragent.UserAgentParserResult;
 import com.petpool.config.security.JwtCodec;
@@ -31,7 +31,7 @@ public class AuthFacadeImpl implements AuthFacade {
 
   private final UserAgentParser userAgentParser;
 
-  private final IPParser ipParser;
+  private final IpParser ipParser;
 
 
   @Autowired
@@ -39,7 +39,7 @@ public class AuthFacadeImpl implements AuthFacade {
       UserService userService,
       PasswordEncoder passwordEncoder,
       JwtCodec jwtCodec, SecurityConf securityConf,
-      UserAgentParser userAgentParser, IPParser ipParser) {
+      UserAgentParser userAgentParser, IpParser ipParser) {
     this.userService = userService;
     this.passwordEncoder = passwordEncoder;
     this.jwtCodec = jwtCodec;
