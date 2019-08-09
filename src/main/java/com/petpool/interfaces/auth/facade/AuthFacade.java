@@ -36,6 +36,10 @@ public interface AuthFacade {
    */
   Optional<GeneratedToken> refreshTokenForUser(String refreshToken, HttpHeaders headers);
 
+  Boolean isUniqueByUserName(String login);
+
+  Boolean isUniqueByEmail(String email);
+
   @Data
   @AllArgsConstructor
   class Credentials {

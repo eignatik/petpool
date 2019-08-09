@@ -1,12 +1,6 @@
 package com.petpool.application.impl;
 
-import com.petpool.domain.model.user.Role;
-import com.petpool.domain.model.user.Token;
-import com.petpool.domain.model.user.TokenRepository;
-import com.petpool.domain.model.user.User;
-import com.petpool.domain.model.user.UserRepository;
-import com.petpool.domain.model.user.RoleRepository;
-import com.petpool.domain.model.user.UserType;
+import com.petpool.domain.model.user.*;
 import com.petpool.domain.service.UserService;
 import java.util.Date;
 import java.util.List;
@@ -22,13 +16,20 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final TokenRepository tokenRepository;
+  private final PersonRepository personRepository;
 
   @Autowired
   public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
-      TokenRepository tokenRepository) {
+      TokenRepository tokenRepository, PersonRepository personRepository) {
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
     this.tokenRepository = tokenRepository;
+    this.personRepository = personRepository;
+  }
+
+  @Override
+  public Person savePerson(Person person) {
+    return personRepository.save(person);
   }
 
   @Override

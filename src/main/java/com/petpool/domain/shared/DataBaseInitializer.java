@@ -1,9 +1,11 @@
 package com.petpool.domain.shared;
 
+import com.petpool.domain.model.user.Person;
 import com.petpool.domain.model.user.Role;
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.model.user.UserType;
 import com.petpool.domain.service.UserService;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -70,6 +72,15 @@ public class DataBaseInitializer {
         new Date(System.currentTimeMillis()),
         Set.of(userRole));
     userService.saveUser(user);
+
+    var person = new Person(
+            "John",
+            "Doe",
+            "Saint Petersburg",
+            "ru",
+            Set.of(user));
+    userService.savePerson(person);
+
    // eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiVVNFUixBRE1JTiJ9.6p3hItj37M_Aw7M0rNiHSe6bHhdGNgH8dNZ2Ol_Tw28
    // eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiVVNFUixBRE1JTiJ9.6p3hItj37M_Aw7M0rNiHSe6bHhdGNgH8dNZ2Ol_Tw28
   }

@@ -1,5 +1,6 @@
 package com.petpool.interfaces.auth;
 
+import com.google.common.collect.ImmutableMap;
 import com.petpool.application.util.response.ErrorType;
 import com.petpool.application.util.response.Response;
 import com.petpool.interfaces.auth.facade.AuthFacade;
@@ -8,13 +9,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/token")
@@ -50,5 +45,26 @@ public class AuthController {
         .refreshTokenForUser(refreshToken, headers)
         .map(Response::ok)
         .orElse(Response.error(ErrorType.BAD_REQUEST,"Refresh token incorrect"));
+  }
+
+  @GetMapping("check/unique")
+  public @ResponseBody
+  ResponseEntity<Response> checkUnique(
+          @RequestParam(value="login", required=false) String login,
+          @RequestParam(value="email", required=false) String email) {
+    if(isNullOrEmpty(login) && isNullOrEmpty(email))
+      return Response.error(ErrorType.BAD_REQUEST,"Request must have parameters");
+
+    var isUniqueByUserName = authFacade.isUniqueByUserName(login.trim());
+    var isUniqueByEmail = authFacade.isUniqueByEmail(email.trim());
+    return Response.ok(ImmutableMap.of(
+            "uniqueUserName", isUniqueByUserName,
+            "uniqueEmail", isUniqueByEmail));
+  }
+
+  private boolean isNullOrEmpty(String str) {
+    if(str != null && !str.trim().isEmpty())
+      return false;
+    return true;
   }
 }
