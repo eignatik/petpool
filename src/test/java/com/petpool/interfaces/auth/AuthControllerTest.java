@@ -88,21 +88,4 @@ public class AuthControllerTest {
     Assert.assertTrue(response.getBody().isErrorPresent(), "isErrorPresent should be true");
     verify(facade, never()).requestTokenForUser(Mockito.any(Credentials.class), eq(headers));
   }
-
-  @Test
-  public void testCheckUnique_returnsError_whenParametersIsEmpty() {
-    ResponseEntity<Response> response = controller.checkUnique(" ", "");
-    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK, "Status code should be OK");
-    Assert.assertTrue(response.getBody().isErrorPresent(), "isErrorPresent should be true");
-    Assert.assertNotNull(response.getBody().getError(), "Error code shouldn't be empty");
-  }
-
-  @Test
-  public void testCheckUnique_returnsError_whenParametersIsExisted() {
-    ResponseEntity<Response> response = controller.checkUnique(TEST_NAME, TEST_EMAIL);
-    Assert.assertEquals(response.getStatusCode(), HttpStatus.OK, "Status code should be OK");
-    Assert.assertEquals(response.getBody().getError(), null, "Error should be null");
-    Assert.assertNull(response.getBody().getError(), "Error should be empty");
-    Assert.assertNotNull(response.getBody().getPayload(), "Response shouldn't be empty");
-  }
 }

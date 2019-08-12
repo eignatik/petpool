@@ -4,6 +4,7 @@ import com.petpool.domain.model.user.Person;
 import com.petpool.domain.model.user.Role;
 import com.petpool.domain.model.user.User;
 import com.petpool.domain.model.user.UserType;
+import com.petpool.domain.service.PersonService;
 import com.petpool.domain.service.UserService;
 
 import java.util.Date;
@@ -20,11 +21,13 @@ import org.springframework.stereotype.Component;
 public class DataBaseInitializer {
 
   private final UserService userService;
+  private final PersonService personService;
   private final PasswordEncoder encoder;
 
   @Autowired
-  public DataBaseInitializer(UserService userService, PasswordEncoder encoder) {
+  public DataBaseInitializer(UserService userService, PersonService personService, PasswordEncoder encoder) {
     this.userService = userService;
+    this.personService = personService;
     this.encoder = encoder;
   }
 
@@ -79,7 +82,7 @@ public class DataBaseInitializer {
             "Saint Petersburg",
             "ru",
             Set.of(user));
-    userService.savePerson(person);
+    personService.savePerson(person);
 
    // eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiVVNFUixBRE1JTiJ9.6p3hItj37M_Aw7M0rNiHSe6bHhdGNgH8dNZ2Ol_Tw28
    // eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiVVNFUixBRE1JTiJ9.6p3hItj37M_Aw7M0rNiHSe6bHhdGNgH8dNZ2Ol_Tw28

@@ -102,16 +102,6 @@ public class AuthFacadeImpl implements AuthFacade {
         .map(token -> updateToken(token, userAgent, ipParser.parse(headers)));
   }
 
-  @Override
-  public Boolean isUniqueByUserName(String name) {
-    return userService.findByName(name).isEmpty();
-  }
-
-  @Override
-  public Boolean isUniqueByEmail(String email) {
-    return userService.findByEmail(email).isEmpty();
-  }
-
   private boolean checkPassword(String password, String encodedPassword) {
     return passwordEncoder.matches(password, encodedPassword);
   }
