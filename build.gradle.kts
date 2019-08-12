@@ -29,7 +29,7 @@ object DependencyVersions {
     const val commonLangVersion = "3.8.1"
     const val collectionUtilsVersion = "4.3"
     const val guavaVersion = "19.0"
-    const val jacksonVersion = "2.9.9"
+    const val jacksonVersion = "2.9.9.3"
     const val mockitoVersion = "2.4.2"
     const val testNGVersion = "6.8"
     const val logbackVersion = "1.2.3"
