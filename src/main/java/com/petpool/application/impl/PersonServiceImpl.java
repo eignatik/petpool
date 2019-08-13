@@ -4,7 +4,11 @@ import com.petpool.domain.model.user.Person;
 import com.petpool.domain.model.user.PersonRepository;
 import com.petpool.domain.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
+@Transactional
 public class PersonServiceImpl implements PersonService {
     private final PersonRepository personRepository;
 
