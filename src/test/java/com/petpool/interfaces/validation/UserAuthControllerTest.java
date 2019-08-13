@@ -20,6 +20,7 @@ public class UserAuthControllerTest {
 
     @Mock
     private UserAuthFacade facade;
+
     @InjectMocks
     private UserAuthController controller;
 

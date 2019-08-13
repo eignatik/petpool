@@ -18,7 +18,7 @@ public class UserAuthController {
         this.userAuthFacade = userAuthFacade;
     }
 
-    @GetMapping("unique")
+    @GetMapping("unique/login")
     public @ResponseBody
     ResponseEntity<Response> checkUniqueByLogin(@RequestParam(value="login") String login) {
         if(isNullOrEmpty(login))
@@ -28,7 +28,7 @@ public class UserAuthController {
         return Response.ok(ImmutableMap.of("uniqueUserName", isUniqueByUserName));
     }
 
-    @GetMapping("unique")
+    @GetMapping("unique/email")
     public @ResponseBody
     ResponseEntity<Response> checkUniqueByEmail(@RequestParam(value="email") String email) {
         if(isNullOrEmpty(email))
