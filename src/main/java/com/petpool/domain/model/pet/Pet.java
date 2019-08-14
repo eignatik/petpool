@@ -24,13 +24,13 @@ public class Pet {
     @Version
     private Long version;
 
-    @Column(name = "pet_name", unique = true, nullable = false, length = 20)
+    @Column(name = "pet_name", nullable = false, length = 20)
     private String name;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String breed;
 
     @Enumerated(EnumType.STRING)
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private PetType type;
 }
