@@ -37,37 +37,34 @@ public class UserAuthControllerTest {
     @Test
     public void testCheckUniqueUserName_returnsError_whenParametersIsEmpty() {
         ResponseEntity<Response> response = controller.checkUniqueByLogin(" ");
-        returnsError_whenParametersIsEmpty(response);
+        returnsErrorWhenParametersIsEmpty(response);
     }
 
     @Test
     public void testCheckUniqueEmail_returnsError_whenParametersIsEmpty() {
         ResponseEntity<Response> response = controller.checkUniqueByEmail(" ");
-        returnsError_whenParametersIsEmpty(response);
+        returnsErrorWhenParametersIsEmpty(response);
     }
 
     @Test
     public void testCheckUniqueUserName_returnsError_whenParametersIsExisted() {
         ResponseEntity<Response> response = controller.checkUniqueByLogin(TEST_NAME);
-        returnsError_whenParametersIsExisted(response);
+        returnsErrorWhenParametersIsExisted(response);
     }
 
     @Test
     public void testCheckUniqueEmail_returnsError_whenParametersIsExisted() {
         ResponseEntity<Response> response = controller.checkUniqueByEmail(TEST_EMAIL);
-        returnsError_whenParametersIsExisted(response);
+        returnsErrorWhenParametersIsExisted(response);
     }
 
-    private void returnsError_whenParametersIsEmpty(ResponseEntity<Response> response) {
+    private void returnsErrorWhenParametersIsEmpty(ResponseEntity<Response> response) {
         Assert.assertEquals(response.getStatusCode(), HttpStatus.OK, "Status code should be OK");
         Assert.assertTrue(response.getBody().isErrorPresent(), "isErrorPresent should be true");
-        Assert.assertNotNull(response.getBody().getError(), "Error code shouldn't be empty");
     }
 
-    private void returnsError_whenParametersIsExisted(ResponseEntity<Response> response) {
+    private void returnsErrorWhenParametersIsExisted(ResponseEntity<Response> response) {
         Assert.assertEquals(response.getStatusCode(), HttpStatus.OK, "Status code should be OK");
-        Assert.assertEquals(response.getBody().getError(), null, "Error should be null");
-        Assert.assertNull(response.getBody().getError(), "Error should be empty");
         Assert.assertNotNull(response.getBody().getPayload(), "Response shouldn't be empty");
     }
 
