@@ -81,7 +81,7 @@ public class DataBaseInitializer {
             "Doe",
             "Saint Petersburg",
             "ru",
-            Set.of(user));
+            user);
     personService.savePerson(person);
 
    // eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiVVNFUixBRE1JTiJ9.6p3hItj37M_Aw7M0rNiHSe6bHhdGNgH8dNZ2Ol_Tw28

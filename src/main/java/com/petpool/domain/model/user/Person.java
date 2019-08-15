@@ -31,11 +31,7 @@ public class Person {
     //TODO: write CountryEnum
     private final String country;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name="person_users",
-            joinColumns = @JoinColumn( name="person_id"),
-            inverseJoinColumns = @JoinColumn( name="user_id")
-    )
-    private final Set<User> users;
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private final User user;
 }
