@@ -10,12 +10,16 @@ import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
 public class UserAgentParserStrategyImpl implements UserAgentParserStrategy {
 
-  @Override
-  public UserAgentParserResult parse(String userAgent) {
-    UserAgentAnalyzer analyzer = UserAgentAnalyzer
+  private UserAgentAnalyzer analyzer;
+
+  public UserAgentParserStrategyImpl() {
+    analyzer = UserAgentAnalyzer
         .newBuilder()
         .build();
+  }
 
+  @Override
+  public UserAgentParserResult parse(String userAgent) {
     UserAgent agent = analyzer.parse(userAgent);
 
     String osName = agent.getValue(OPERATING_SYSTEM_NAME);

@@ -1,7 +1,9 @@
 package com.petpool.application.util.useragent;
 
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+@Data
 public class Browser {
 
   private String name;
