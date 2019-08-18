@@ -11,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 @Data
 @Entity
@@ -33,4 +35,19 @@ public class Pet {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PetType type;
+
+    @Column(nullable = false)
+    private int age;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PetGender gender;
+
+    @Max(10)
+    @Min(1)
+    @Column(nullable = false)
+    private int healthRate;
+
+    @Column(nullable = false)
+    private boolean tamed;
 }
