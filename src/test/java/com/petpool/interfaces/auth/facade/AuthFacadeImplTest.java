@@ -146,7 +146,6 @@ public class AuthFacadeImplTest {
     when(ipParser.parse(any(HttpHeaders.class)))
         .thenReturn(USER_AGENT);
 
-
     Optional<GeneratedToken> tokens = facade
         .refreshTokenForUser(refreshToken, headers);
 
@@ -177,7 +176,9 @@ public class AuthFacadeImplTest {
   }
 
   private UserAgentParserResult getStubUserAgentParserResult() {
-    return new UserAgentParserResult(new OS("win", "10"), new Browser("firefox", "10"));
+    return new UserAgentParserResult(
+        OS.builder().name("windows").version("10").build(),
+        Browser.builder().name("firefox").version("10").build());
   }
 
 }

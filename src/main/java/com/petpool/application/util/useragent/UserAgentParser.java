@@ -3,8 +3,14 @@ package com.petpool.application.util.useragent;
 public class UserAgentParser {
 
   private UserAgentParserStrategy strategy;
-  private static final UserAgentParserResult DEFAULT_RESULT = new UserAgentParserResult(
-      new OS("unknown", "unknown"), new Browser("unknown", "unknown"));
+  public static final UserAgentParserResult DEFAULT_RESULT;
+
+  static {
+
+    DEFAULT_RESULT = new UserAgentParserResult(
+        OS.builder().build(),
+        Browser.builder().build());
+  }
 
   public UserAgentParser(UserAgentParserStrategy strategy) {
     this.strategy = strategy;

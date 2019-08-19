@@ -4,16 +4,16 @@ import static nl.basjes.parse.useragent.UserAgent.AGENT_NAME;
 import static nl.basjes.parse.useragent.UserAgent.AGENT_VERSION;
 import static nl.basjes.parse.useragent.UserAgent.OPERATING_SYSTEM_NAME;
 import static nl.basjes.parse.useragent.UserAgent.OPERATING_SYSTEM_VERSION;
-import static nl.basjes.parse.useragent.UserAgent.UNKNOWN_VALUE;
-import static nl.basjes.parse.useragent.UserAgent.UNKNOWN_VERSION;
 
-import java.util.Objects;
+import com.petpool.application.util.useragent.Browser.BrowserBuilder;
+import com.petpool.application.util.useragent.OS.OSBuilder;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
 public class UserAgentParserStrategyImpl implements UserAgentParserStrategy {
 
   private UserAgentAnalyzer analyzer;
+  private static final String HACKER = "Hacker";
 
   public UserAgentParserStrategyImpl() {
     analyzer = UserAgentAnalyzer
@@ -25,21 +25,31 @@ public class UserAgentParserStrategyImpl implements UserAgentParserStrategy {
   public UserAgentParserResult parse(String userAgent) {
     UserAgent agent = analyzer.parse(userAgent);
 
-    String tmp = agent.getValue(OPERATING_SYSTEM_NAME);
+    OSBuilder osBuilder = OS.builder();
+    BrowserBuilder browserBuilder = Browser.builder();
 
-    String osName = Objects.equals(tmp, UNKNOWN_VALUE) ? "unknown" : tmp;
-    tmp = agent.getValue(OPERATING_SYSTEM_VERSION);
-    String osVersion = Objects.equals(tmp, UNKNOWN_VERSION) ? "unknown" : tmp;
-    String browserName = agent.getValue(AGENT_NAME);
-    String browserVersion = agent.getValue(AGENT_VERSION);
-
-    if (Objects.equals(osName, browserName) && !Objects.equals(osName, "Hacker")) {
-      browserName = "unknown";
-      browserVersion = "unknown";
+    String osName = agent.getValue(OPERATING_SYSTEM_NAME);
+    if (!osName.equals(HACKER) && !osName.equals("Unknown")) {
+      osBuilder.name(osName);
     }
 
-    OS os = new OS(osName, osVersion);
-    Browser browser = new Browser(browserName, browserVersion);
-    return new UserAgentParserResult(os, browser);
+    String osVersion = agent.getValue(OPERATING_SYSTEM_VERSION);
+    if (!osVersion.equals(HACKER) && !osName.equals("??")) {
+      osBuilder.version(osVersion);
+    }
+
+    //Checking browserName.equals(osName) needed because lib is stupid.
+    // Lib can return values equals OS'values, if browser description  not present in user-agent header.
+    String browserName = agent.getValue(AGENT_NAME);
+    if (!browserName.equals(HACKER) && !browserName.equals(osName)) {
+      browserBuilder.name(browserName);
+    }
+
+    String browserVersion = agent.getValue(AGENT_VERSION);
+    if (!browserVersion.equals(HACKER) && !browserName.equals(osVersion)) {
+      browserBuilder.version(browserVersion);
+    }
+
+    return new UserAgentParserResult(osBuilder.build(), browserBuilder.build());
   }
 }

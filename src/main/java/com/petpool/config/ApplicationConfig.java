@@ -6,7 +6,7 @@ import com.petpool.application.util.EncryptionTool;
 import com.petpool.application.util.LocalDataBaseProperties;
 import com.petpool.application.util.ip.IpParser;
 import com.petpool.application.util.useragent.UserAgentParser;
-import com.petpool.application.util.useragent.UserAgentParserStrategyStub;
+import com.petpool.application.util.useragent.UserAgentParserStrategyImpl;
 import com.petpool.config.security.SecurityConf;
 import com.petpool.domain.shared.DataBaseInitializer;
 import io.jsonwebtoken.security.Keys;
@@ -71,7 +71,7 @@ public class ApplicationConfig {
 
   @Bean
   public UserAgentParser userAgentParser(){
-    return new UserAgentParser(new UserAgentParserStrategyStub());
+    return new UserAgentParser(new UserAgentParserStrategyImpl());
   }
 
   @Bean
