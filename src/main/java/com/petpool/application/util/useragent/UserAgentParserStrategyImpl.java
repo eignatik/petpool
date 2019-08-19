@@ -10,6 +10,9 @@ import com.petpool.application.util.useragent.OS.OSBuilder;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
+/**
+ * User-agent string parser
+ */
 public class UserAgentParserStrategyImpl implements UserAgentParserStrategy {
 
   private UserAgentAnalyzer analyzer;
@@ -21,6 +24,12 @@ public class UserAgentParserStrategyImpl implements UserAgentParserStrategy {
         .build();
   }
 
+  /**
+   * Parse user-agent header's field string
+   *
+   * @param userAgent string represents user-agent header's field
+   * @return result of parsing
+   */
   @Override
   public UserAgentParserResult parse(String userAgent) {
     UserAgent agent = analyzer.parse(userAgent);

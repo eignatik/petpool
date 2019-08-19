@@ -44,7 +44,7 @@ public class UserAgentParserStrategyImplTest {
   }
 
   @Test(dataProvider = "parseUserAgent")
-  public void testParse_(String userAgent, UserAgentParserResult expected) {
+  public void test_Parse_UserAgent(String userAgent, UserAgentParserResult expected) {
     UserAgentParserResult actual = parser.parse(userAgent);
     Assert.assertEquals(actual, expected);
   }
