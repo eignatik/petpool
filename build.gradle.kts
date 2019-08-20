@@ -40,6 +40,7 @@ object DependencyVersions {
     const val springBootVersion = "2.1.6.RELEASE"
     const val ormVersion = "5.1.8.RELEASE"
     const val connectionPoolVersion = "2.6.0"
+    const val yauaaVersion = "5.11"
 }
 
 plugins {
@@ -114,6 +115,7 @@ dependencies {
     implementation("io.jsonwebtoken", "jjwt-impl", DependencyVersions.jwtVersion)
     implementation("io.jsonwebtoken", "jjwt-jackson", DependencyVersions.jwtVersion)
 
+    implementation("nl.basjes.parse.useragent", "yauaa", DependencyVersions.yauaaVersion)
 }
 
 configure<JavaPluginConvention> {
