@@ -23,6 +23,8 @@ public class UserAgentParserStrategyImplTest {
 
         {"something", UserAgentParser.DEFAULT_RESULT},
 
+        {"", UserAgentParser.DEFAULT_RESULT},
+
         {null, UserAgentParser.DEFAULT_RESULT},
 
         {"(Windows NT 10.0)  Chrome/53.0.2785.101",
@@ -49,3 +51,4 @@ public class UserAgentParserStrategyImplTest {
     Assert.assertEquals(actual, expected);
   }
 }
+
