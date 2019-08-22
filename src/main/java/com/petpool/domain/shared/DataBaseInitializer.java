@@ -84,8 +84,6 @@ public class DataBaseInitializer {
             user);
     personService.savePerson(person);
 
-   // eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiVVNFUixBRE1JTiJ9.6p3hItj37M_Aw7M0rNiHSe6bHhdGNgH8dNZ2Ol_Tw28
-   // eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiVVNFUixBRE1JTiJ9.6p3hItj37M_Aw7M0rNiHSe6bHhdGNgH8dNZ2Ol_Tw28
   }
 
 }

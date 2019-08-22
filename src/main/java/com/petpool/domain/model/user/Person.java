@@ -3,13 +3,13 @@ package com.petpool.domain.model.user;
 import javax.persistence.*;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Set;
 
 @Data
 @Entity
 @Table(name = "person")
+@NoArgsConstructor(force = true)
 @RequiredArgsConstructor
 public class Person {
 
