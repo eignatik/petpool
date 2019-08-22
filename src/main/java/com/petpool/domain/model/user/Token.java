@@ -40,10 +40,10 @@ public class Token{
   @Column(name = "user_agent")
   private String userAgent;
 
-  @Column(name = "os", length = 10)
+  @Column(name = "os", length = 64)
   private String os;
 
-  @Column(length = 16)
+  @Column(length = 64)
   private String browser;
 
   @ManyToOne()
