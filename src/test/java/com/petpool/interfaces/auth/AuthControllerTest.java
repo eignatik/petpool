@@ -88,5 +88,4 @@ public class AuthControllerTest {
     Assert.assertTrue(response.getBody().isErrorPresent(), "isErrorPresent should be true");
     verify(facade, never()).requestTokenForUser(Mockito.any(Credentials.class), eq(headers));
   }
-
 }

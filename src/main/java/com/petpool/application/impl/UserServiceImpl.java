@@ -1,12 +1,6 @@
 package com.petpool.application.impl;
 
-import com.petpool.domain.model.user.Role;
-import com.petpool.domain.model.user.Token;
-import com.petpool.domain.model.user.TokenRepository;
-import com.petpool.domain.model.user.User;
-import com.petpool.domain.model.user.UserRepository;
-import com.petpool.domain.model.user.RoleRepository;
-import com.petpool.domain.model.user.UserType;
+import com.petpool.domain.model.user.*;
 import com.petpool.domain.service.UserService;
 import java.util.Date;
 import java.util.List;

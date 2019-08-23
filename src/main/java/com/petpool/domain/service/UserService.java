@@ -1,9 +1,7 @@
 package com.petpool.domain.service;
 
-import com.petpool.domain.model.user.Role;
-import com.petpool.domain.model.user.Token;
-import com.petpool.domain.model.user.User;
-import com.petpool.domain.model.user.UserType;
+import com.petpool.domain.model.user.*;
+
 import java.util.List;
 import java.util.Optional;
 
