@@ -19,7 +19,7 @@ public class IpParserImpl implements IpParser {
 
         if (address != null) {
             String ip = address.getHostName();
-            if (ip != null && !(ip.isEmpty())) {
+            if (!(ip.isEmpty())) {
                 return ip;
             }
         }
@@ -27,8 +27,8 @@ public class IpParserImpl implements IpParser {
         if (list == null) {
             return DEFAULT_PARSE_VALUE;
         } else {
-            // TODO: надо будет потом на реальных пользователях проверить
-            return list.get(0);
+            String[] listIp = list.get(0).split(",");
+            return listIp[0];
         }
     }
 }
