@@ -7,7 +7,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 
 public class IpParserImpl implements IpParser {
-    private static String DEFAULT_PARSE_VALUE = "";
+    private final static String DEFAULT_PARSE_VALUE = "";
 
     @Override
     public @NotNull String parse(HttpHeaders headers) {
