@@ -25,7 +25,7 @@ public class IpParserImpl implements IpParser {
             }
         }
         List<String> list = headers.get("HTTP_X_FORWARDED_FOR");
-        if (list == null || list.size() == 0) {
+        if (list == null || list.isEmpty()) {
             return DEFAULT_PARSE_VALUE;
         }
 
