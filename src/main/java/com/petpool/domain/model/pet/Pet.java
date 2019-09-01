@@ -1,5 +1,6 @@
 package com.petpool.domain.model.pet;
 
+import com.petpool.domain.model.user.User;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -11,11 +12,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.util.Set;
 
 @Data
 @Entity
@@ -24,7 +28,8 @@ public class Pet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @Column(name = "pet_id")
+    private Long petId;
 
     @Version
     private Long version;
@@ -32,10 +37,10 @@ public class Pet {
     @Column(name = "pet_name", nullable = false, length = 20)
     private String name;
 
-    @Column(nullable = false)
-    private String breed;
+    @Column
+    private String breed = "undefined";
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "type_id")
     private PetType type;
 
@@ -53,4 +58,12 @@ public class Pet {
 
     @Column(nullable = false)
     private boolean tamed;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "pet_user",
+            joinColumns = @JoinColumn(name = "pet_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> users;
 }
