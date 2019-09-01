@@ -19,16 +19,21 @@ public class IpParserImpl implements IpParser {
 
         if (address != null) {
             String ip = address.getHostName();
+            System.out.println("ip" + ip);
             if (!(ip.isEmpty())) {
                 return ip;
             }
         }
         List<String> list = headers.get("HTTP_X_FORWARDED_FOR");
-        if (list == null) {
+        if (list == null || list.size() == 0) {
             return DEFAULT_PARSE_VALUE;
-        } else {
+        }
+
+        if (list.get(0) != null) {
             String[] listIp = list.get(0).split(",");
             return listIp[0];
         }
+
+        return DEFAULT_PARSE_VALUE;
     }
 }
