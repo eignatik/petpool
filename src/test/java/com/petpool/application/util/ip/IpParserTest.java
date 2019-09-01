@@ -1,7 +1,6 @@
 package com.petpool.application.util.ip;
 
 import org.springframework.http.HttpHeaders;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.net.InetSocketAddress;
