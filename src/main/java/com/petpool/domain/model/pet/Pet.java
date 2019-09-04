@@ -12,14 +12,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.Set;
 
 @Data
 @Entity
@@ -59,11 +57,14 @@ public class Pet {
     @Column(nullable = false)
     private boolean tamed;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "pet_user",
-            joinColumns = @JoinColumn(name = "pet_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<User> users;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner")
+    private User owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host")
+    private User host;
+
+    @Column(nullable = false)
+    private boolean dead;
 }

@@ -13,10 +13,15 @@ import java.util.Optional;
 @Repository
 public interface PetRepository extends JpaRepository<Pet, Long> {
 
+
     @Nullable
-    @Query("select pet from Pet pet where lower(pet.breed) = lower(:breed)")
-    List<Pet> findByBreed(@Param("breed") String breed);
+    @Query(value = "select pet from Pet pet where lower(pet.breed) like lower(concat('%', :breedToFind, '%'))")
+    List<Pet> findByBreed(@Param("breedToFind") String breed);
+
     Optional<Pet> findPetByType(PetType type);
-    Optional<Pet> findPetByUser(User user);
+
+    Optional<Pet> findPetByHost(User user);
+
+    Pet findPetByOwner(User user);
 
 }
