@@ -1,8 +1,6 @@
 package com.petpool.domain.model.pet;
 
-import com.petpool.domain.model.user.User;
-import lombok.Data;
-
+import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -14,7 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.time.LocalDate;
+
+import com.petpool.domain.model.user.User;
+import lombok.Data;
 
 @Data
 @Entity
@@ -23,7 +23,7 @@ public class PetHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "history_id")
+    @Column(name = "id")
     private Long historyId;
 
     @OneToOne(fetch = FetchType.EAGER)

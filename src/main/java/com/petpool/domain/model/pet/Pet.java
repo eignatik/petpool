@@ -1,8 +1,8 @@
 package com.petpool.domain.model.pet;
 
-import com.petpool.domain.model.user.User;
-import lombok.Data;
-
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Calendar;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -19,6 +19,10 @@ import javax.persistence.Version;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import com.petpool.domain.model.user.User;
+import lombok.Data;
+import org.springframework.data.annotation.Transient;
+
 @Data
 @Entity
 @Table(name = "pet")
@@ -26,7 +30,7 @@ public class Pet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "pet_id")
+    @Column(name = "id")
     private Long petId;
 
     @Version
@@ -43,7 +47,7 @@ public class Pet {
     private PetType type;
 
     @Column(nullable = false)
-    private int age;
+    private Calendar birthDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -67,4 +71,43 @@ public class Pet {
 
     @Column(nullable = false)
     private boolean dead;
+
+    @Transient
+    public Age getAge(LocalDate birthDate) {
+        LocalDate today = LocalDate.now();
+        LocalDate birthday = LocalDate.of(birthDate.getYear(), birthDate.getMonth(), birthDate.getDayOfMonth());
+
+        Period p = Period.between(birthday, today);
+
+        return new Age(p.getYears(), p.getMonths());
+    }
+
+    final class Age {
+        private int years;
+
+        private int months;
+
+        public void setYears(int years) {
+            this.years = years;
+        }
+
+        public void setMonths(int months) {
+            this.months = months;
+        }
+
+        public Age(int years, int months) {
+            this.years = years;
+            this.months = months;
+        }
+
+        public int getYears() {
+            return years;
+        }
+
+        public int getMonths() {
+            return months;
+        }
+
+    }
+
 }
