@@ -24,7 +24,7 @@ public class PetHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private Long historyId;
+    private Long id;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
@@ -39,4 +39,5 @@ public class PetHistory {
 
     @Column(name = "end_keeping_date")
     private LocalDate endKeepingDate;
+
 }
