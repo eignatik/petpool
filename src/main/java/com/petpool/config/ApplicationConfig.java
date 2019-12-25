@@ -43,7 +43,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Slf4j
 @Configuration
-@PropertySource({"environment.properties", "environment-local.properties","security.properties"})
+@PropertySource({
+    "environment.properties",
+    "environment-local.properties",
+    "security.properties",
+    "upload_files.properties"
+})
 @EnableJpaRepositories(basePackages = {"com.petpool.domain.model"})
 @EnableTransactionManagement
 @Import({SpringSecurityConfig.class})

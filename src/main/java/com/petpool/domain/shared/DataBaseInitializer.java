@@ -60,29 +60,34 @@ public class DataBaseInitializer {
     Role userRole = userService.findRoleByType(UserType.USER)
         .orElseThrow(() -> new RuntimeException("Нет такой роли пользователя"));
 
-    User user = new User(
-        "root",
-        encoder.encode("123"),
-        "root@test.test",
-        new Date(System.currentTimeMillis()),
-        Set.of(adminRole, userRole));
-    userService.saveUser(user);
+    if(userService.findByEmail("root@test.test").isEmpty()){
+      User user = new User(
+          "root",
+          encoder.encode("123"),
+          "root@test.test",
+          new Date(System.currentTimeMillis()),
+          Set.of(adminRole, userRole));
+      userService.saveUser(user);
 
-    user = new User(
-        "user",
-        encoder.encode("123"),
-        "user@test.test",
-        new Date(System.currentTimeMillis()),
-        Set.of(userRole));
-    userService.saveUser(user);
+    }
 
-    var person = new Person(
-            "John",
-            "Doe",
-            "Saint Petersburg",
-            "ru",
-            user);
-    personService.savePerson(person);
+
+    if(userService.findByEmail("user@test.test").isEmpty()){
+      User user = user = new User(
+          "user",
+          encoder.encode("123"),
+          "user@test.test",
+          new Date(System.currentTimeMillis()),
+          Set.of(userRole));
+      userService.saveUser(user);
+      var person = new Person(
+          "John",
+          "Doe",
+          "Saint Petersburg",
+          "ru",
+          user);
+      personService.savePerson(person);
+    }
 
   }
 
